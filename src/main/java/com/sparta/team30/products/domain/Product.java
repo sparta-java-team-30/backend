@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Product extends Timestamped {
 
     @Id
-    @GeneratedValue(generator = "UUID")
+    @GeneratedValue(strategy = GenerationType.UUID)
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID productId;
 
