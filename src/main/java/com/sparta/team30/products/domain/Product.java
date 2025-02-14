@@ -4,19 +4,21 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Date;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @Table(name = "p_product")
-public class Product {
+public class Product extends Timestamped {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String productId;
+    @GeneratedValue(generator = "UUID")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private UUID productId;
 
     @Column(nullable = false, length = 100)
     private String productName;
@@ -24,21 +26,11 @@ public class Product {
     @Column(nullable = false)
     private int price;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false, updatable = false)
-    private Date createdAt;
-
     @Column(nullable = false, length = 50)
     private String createdBy;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
-
     @Column(length = 50)
     private String updatedBy;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date deletedAt;
 
     @Column(length = 50)
     private String deletedBy;
@@ -49,6 +41,12 @@ public class Product {
     @Column(nullable = false)
     private boolean isDeleted;
 
-    @Column(nullable = false)
-    private String storeId;
+//    @ManyToOne
+//    @JoinColumn(name = "store_id", referencedColumnName = "storeId", nullable = false)
+//    private Store store;
+
+    public void softDelete(String deletedBy) {
+        super.softDelete();
+        this.deletedBy = deletedBy;
+    }
 }
