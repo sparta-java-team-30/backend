@@ -13,7 +13,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name = "p_product")
-public class Product extends Timestamped {
+public class Product {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -45,8 +45,8 @@ public class Product extends Timestamped {
 //    @JoinColumn(name = "store_id", referencedColumnName = "storeId", nullable = false)
 //    private Store store;
 
-    public void softDelete(String deletedBy) {
-        super.softDelete();
-        this.deletedBy = deletedBy;
-    }
+//    public void softDelete(String deletedBy) {
+//        super.softDelete();
+//        this.deletedBy = deletedBy;
+//    }
 }
