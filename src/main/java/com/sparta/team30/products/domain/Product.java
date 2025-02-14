@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import java.util.UUID;
+
+import java.util.Date;
 
 @Entity
 @Getter
@@ -17,8 +16,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @JdbcTypeCode(SqlTypes.VARCHAR)
-    private UUID productId;
+    private String productId;
 
     @Column(nullable = false, length = 100)
     private String productName;
@@ -26,18 +24,31 @@ public class Product {
     @Column(nullable = false)
     private int price;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false)
+    private Date createdAt;
+
+    @Column(nullable = false, length = 50)
+    private String createdBy;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
+
+    @Column(length = 50)
+    private String updatedBy;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date deletedAt;
+
+    @Column(length = 50)
+    private String deletedBy;
+
     @Column(nullable = false)
     private boolean isVisible;
 
     @Column(nullable = false)
     private boolean isDeleted;
 
-//    @ManyToOne
-//    @JoinColumn(name = "store_id", referencedColumnName = "storeId", nullable = false)
-//    private Store store;
-
-//    public void softDelete(String deletedBy) {
-//        super.softDelete();
-//        this.deletedBy = deletedBy;
-//    }
+    @Column(nullable = false)
+    private String storeId;
 }
