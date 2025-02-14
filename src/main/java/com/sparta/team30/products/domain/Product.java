@@ -26,15 +26,6 @@ public class Product {
     @Column(nullable = false)
     private int price;
 
-    @Column(nullable = false, length = 50)
-    private String createdBy;
-
-    @Column(length = 50)
-    private String updatedBy;
-
-    @Column(length = 50)
-    private String deletedBy;
-
     @Column(nullable = false)
     private boolean isVisible;
 
