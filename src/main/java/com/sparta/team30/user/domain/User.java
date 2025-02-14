@@ -24,6 +24,6 @@ public class User {
     private String nickname;
 
     @Column
-    private Boolean is_public;
+    private Boolean isPublic;
 
 }
