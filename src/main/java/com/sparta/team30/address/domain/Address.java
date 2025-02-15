@@ -19,19 +19,19 @@ public class Address extends BaseEntity {
     @Column(name = "address_id")
     private UUID addressId;
 
-    @Column(name = "user_postcode")
+    @Column(name = "user_postcode", nullable = false)
     private String userPostcode;
 
-    @Column(name = "user_address1")
+    @Column(name = "user_address1", nullable = false)
     private String userAddress1;
 
     @Column(name = "user_address2")
     private String userAddress2;
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
