@@ -25,4 +25,10 @@ public class OrderDetail {
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
+
+    public OrderDetail(Order order, Product product) {
+        this.order = order;
+        this.product = product;
+        this.isDeleted = isDeleted;
+    }
 }
