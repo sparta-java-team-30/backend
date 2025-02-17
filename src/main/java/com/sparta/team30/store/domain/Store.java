@@ -1,11 +1,13 @@
 package com.sparta.team30.store.domain;
 
 import com.sparta.team30.category.domain.Category;
+import com.sparta.team30.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 import java.util.UUID;
 
@@ -14,10 +16,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name = "p_store")
-public class Store {
+public class Store extends BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "UUID")
+    @UuidGenerator
     @JdbcTypeCode(SqlTypes.VARCHAR) //H2?
     @Column(name = "store_id", nullable = false, updatable = false, unique = true)
     private UUID storeId;
