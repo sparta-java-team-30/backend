@@ -3,6 +3,7 @@ package com.sparta.team30.user.domain;
 import com.sparta.team30.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,4 +30,18 @@ public class User extends BaseEntity {
 
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRoleEnum role;
+
+    @Builder
+    public User(String email, String username, String password, String nickname, Boolean isPublic, UserRoleEnum role) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.isPublic = isPublic;
+        this.role = role;
+    }
 }
