@@ -1,5 +1,8 @@
 package com.sparta.team30.infrastructure.config;
 
+import com.sparta.team30.common.util.TokenProvider;
+import com.sparta.team30.infrastructure.security.TokenAuthenticationFilter;
+import com.sparta.team30.infrastructure.security.TokenGenerateFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,11 +16,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+    private final TokenProvider tokenProvider;
+    private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -31,7 +37,23 @@ public class WebSecurityConfig {
                 .anyRequest().permitAll()
         );
 
+        http.addFilterBefore(tokenAuthenticationFilter(), tokenGenerateFilter().getClass());
+        http.addFilterBefore(tokenGenerateFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
+    }
+
+    @Bean
+    public TokenGenerateFilter tokenGenerateFilter() throws Exception {
+        TokenGenerateFilter filter = new TokenGenerateFilter(tokenProvider);
+        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+        filter.setFilterProcessesUrl("/api/auth/signin");
+        return filter;
+    }
+
+    @Bean
+    public TokenAuthenticationFilter tokenAuthenticationFilter(){
+        return new TokenAuthenticationFilter(tokenProvider);
     }
 
     @Bean

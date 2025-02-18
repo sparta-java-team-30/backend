@@ -1,19 +1,21 @@
 package com.sparta.team30.order.service;
 
+import com.sparta.team30.common.exception.OrderAlreadyProcessedException;
+import com.sparta.team30.common.exception.OrderNotFoundException;
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.domain.OrderTypeEnum;
 import com.sparta.team30.order.dto.*;
 import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.products.domain.Product;
 import com.sparta.team30.products.repository.ProductRepository;
-import com.sparta.team30.user.domain.User;
+import com.sparta.team30.user.domain.UserRoleEnum;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final OrderDetailService orderDetailService;
+  //  private final AddressRepository addressRepository;
     @Transactional
     public ResponseCreateOrderDTO addOrder(//User user,
                                 RequestCreateOrderDTO requestCreateOrderDTO) {
@@ -39,13 +42,13 @@ public class OrderService {
         //고객 주소
         //Address address = addressRepository.findByUser(user);
 
-        //전역예외처리
+        //전역예외처리 ( 상품 예외)
         if (requestCreateOrderDTO.getProductList().isEmpty()) {
             throw new IllegalArgumentException("선택 상품이 존재하지 않습니다");
         }
         List<RequestOrderProductDTO> productDTOList = requestCreateOrderDTO.getProductList();
 
-        //전역예외처리
+        //전역예외처리 (상품 예외 )
         productDTOList.stream().forEach(productDTO -> {
             if(productDTO.getProductId()==null){
                 throw new IllegalArgumentException("잘못된 요청입니다.");
@@ -96,5 +99,37 @@ public class OrderService {
 
         return new ResponseOrderDetailsDTO(order,orderProductList);
     }
+
+    @Transactional
+    public void updateOrder(UUID orderId, RequestUpdateOrderDTO orderDTO) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("존재하지 않는 주문입니다."));
+
+        if(order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)))
+                //&& order.getUser().getRole().equals(UserRoleEnum.USER))  //사용자는 5분 이내
+        {
+            throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(5분 초과)");
+        }
+
+        //주소 변경 추가 예정
+        //Address address = AddressRepository.findById(orderDTO.getAddressId);
+        order.update(orderDTO);
+
+    }
+
+    @Transactional
+    public void deleteOrder(UUID orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("존재하지 않는 주문입니다."));
+
+        if(order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5))
+            //&& order.getUser().getRole().equals(UserRoleEnum.USER))  //사용자는 5분 이내
+        ) {
+            throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(5분 초과)");
+        }
+
+        order.delete(order.getUser().getUsername());
+        order.setDeleted(true); //is_deleted 필드 변경
+    }
+
+
 
 }

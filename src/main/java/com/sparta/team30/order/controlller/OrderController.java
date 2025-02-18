@@ -2,6 +2,7 @@ package com.sparta.team30.order.controlller;
 
 import com.sparta.team30.infrastructure.security.UserDetailsImpl;
 import com.sparta.team30.order.dto.RequestCreateOrderDTO;
+import com.sparta.team30.order.dto.RequestUpdateOrderDTO;
 import com.sparta.team30.order.dto.ResponseOrderDetailsDTO;
 import com.sparta.team30.order.dto.ResponseOrderHistoryDTO;
 import com.sparta.team30.order.service.OrderService;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.print.Pageable;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,19 +25,13 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<String> addOrder(//@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<Map> addOrder(//@AuthenticationPrincipal UserDetailsImpl userDetails,
                                             @RequestBody RequestCreateOrderDTO requestCreateOrderDTO) {
-
         //String username = userDetails.getUsername();
 
-        //전역 예외 처리 적용 전
-        try{
             orderService.addOrder(//user,
                     requestCreateOrderDTO);
-            return ResponseEntity.ok("주문이 완료되었습니다.");
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.status(200).body(Map.of("message", "주문이 완료되었습니다."));
     }
 
     @GetMapping
@@ -53,6 +49,22 @@ public class OrderController {
     @GetMapping("/{order-id}")
     public ResponseEntity<ResponseOrderDetailsDTO> getOrderDetails(@PathVariable("order-id") UUID orderId) {
         return ResponseEntity.ok(orderService.getOrderDetails(orderId));
+    }
+
+    @PatchMapping("/{order-id}")
+    public ResponseEntity<Map<String, String>> updateOrder(@PathVariable("order-id") UUID orderId,
+                                                           @RequestBody RequestUpdateOrderDTO orderDTO) {
+        orderService.updateOrder(orderId,orderDTO);
+
+        return ResponseEntity.status(200).body(Map.of("message", "주문이 수정되었습니다."));
+    }
+
+    @DeleteMapping("/{order-id}")
+    public ResponseEntity<Map<String, String>> deleteOrder(@PathVariable("order-id") UUID orderId) {
+
+        orderService.deleteOrder(orderId);
+
+        return ResponseEntity.status(200).body(Map.of("message", "주문이 삭제되었습니다."));
     }
 
 }
