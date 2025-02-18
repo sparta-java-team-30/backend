@@ -1,5 +1,7 @@
 package com.sparta.team30.products.domain;
 
+import com.sparta.team30.common.domain.BaseEntity;
+import com.sparta.team30.store.domain.Store;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,11 +15,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name = "p_product")
-public class Product {
+public class Product extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID productId;
 
     @Column(nullable = false, length = 100)
@@ -32,12 +33,7 @@ public class Product {
     @Column(nullable = false)
     private boolean isDeleted;
 
-//    @ManyToOne
-//    @JoinColumn(name = "store_id", referencedColumnName = "storeId", nullable = false)
-//    private Store store;
-
-//    public void softDelete(String deletedBy) {
-//        super.softDelete();
-//        this.deletedBy = deletedBy;
-//    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", referencedColumnName = "storeId", nullable = false)
+    private Store store;
 }
