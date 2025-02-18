@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -33,11 +34,18 @@ public class Order extends BaseEntity {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
+    @Column(name = "price", nullable = false)
+    private int price;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id"
             //,nullable = false
     )
     private User user;
+
+    @OneToMany(mappedBy = "order")
+    private List<OrderDetail> orderDetails;
+
 
    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id"
@@ -45,7 +53,7 @@ public class Order extends BaseEntity {
     )
     private Address address;
 
-    public Order(RequestCreateOrderDTO requestCreateOrderDTO, OrderTypeEnum orderType
+    public Order(RequestCreateOrderDTO requestCreateOrderDTO, OrderTypeEnum orderType,int price
                  //User user,
                  //Address address
                  ) {
@@ -53,6 +61,7 @@ public class Order extends BaseEntity {
         this.comment = requestCreateOrderDTO.getComment();
         this.orderStatus = "결제 전";
         this.isDeleted = false;
+        this.price = price;
         //this.user = user;
         //this.address = address;
     }
