@@ -6,8 +6,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
+    private final UserDetailsServiceImpl userDetailsService;
     private final static String HEADER_AUTHORIZATION = "Authorization";
     private final static String TOKEN_PREFIX = "Bearer ";
 
@@ -26,7 +29,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             String token = getAccessToken(jwt);
 
             if (tokenProvider.validToken(token)) {
-                Authentication authentication = tokenProvider.getAuthentication(token);
+                String username = tokenProvider.getUsername(token);
+                Authentication authentication = createdAuthentication(username);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
@@ -44,5 +48,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             return authorizationHeader.substring(TOKEN_PREFIX.length());
         }
         return null;
+    }
+
+    private Authentication createdAuthentication(String username) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }

@@ -4,9 +4,12 @@ import com.sparta.team30.common.exception.UserEmailAlreadyExistsException;
 import com.sparta.team30.common.exception.UsernameAlreadyExistsException;
 import com.sparta.team30.user.domain.User;
 import com.sparta.team30.user.domain.UserRoleEnum;
+import com.sparta.team30.user.dto.UserInfoUpdateRequestDto;
 import com.sparta.team30.user.dto.UserSignUpRequestDto;
 import com.sparta.team30.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +45,25 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         userRepository.updateCreatedBy(DEFAULT_USER_CREATED_BY, user.getId());
+    }
+
+    @Transactional
+    @Override
+    public void userInfoUpdate(UserDetails userDetails, UserInfoUpdateRequestDto userInfoUpdateRequestDto) {
+        String username = userDetails.getUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 username을 찾을 수 없습니다."));
+
+        if (userInfoUpdateRequestDto.getEmail() != null) {
+            if (isEmailDuplicated(userInfoUpdateRequestDto.getEmail())) {
+                throw new UserEmailAlreadyExistsException(userInfoUpdateRequestDto.getEmail() +
+                        "은 이미 사용중인 이메일 입니다.");
+            }
+            user.updateEmail(userInfoUpdateRequestDto.getEmail());
+        }
+        if (userInfoUpdateRequestDto.getNickname() != null) {
+            user.updateNickname(userInfoUpdateRequestDto.getNickname());
+        }
     }
 
     private String encodePassword(String password) {

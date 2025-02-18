@@ -93,4 +93,35 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+
+    @ExceptionHandler(OrderAlreadyProcessedException.class)
+    public ResponseEntity<ErrorResponse> OrderAlreadyProcessedException(OrderAlreadyProcessedException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponse> OrderNotFoundException(OrderNotFoundException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_FOUND
+        );
+    }
+    @ExceptionHandler(OrderAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> OrderAccessDeniedException(OrderAccessDeniedException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_ACCEPTABLE.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_ACCEPTABLE
+        );
+    }
 }

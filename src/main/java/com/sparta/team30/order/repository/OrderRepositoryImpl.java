@@ -9,6 +9,7 @@ import com.sparta.team30.order.domain.QOrderDetail;
 import com.sparta.team30.order.dto.ResponseOrderHistoryDTO;
 import com.sparta.team30.products.domain.QProduct;
 import com.sparta.team30.store.domain.QStore;
+import com.sparta.team30.user.domain.UserRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +26,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     QProduct product = QProduct.product;
     QStore store = QStore.store;
 
-    public Page<ResponseOrderHistoryDTO> findByUserIdAndProductOrStoreName(String search, Long userId, Pageable pageable ,boolean isAsc) {
+    public Page<ResponseOrderHistoryDTO> findByUserIdAndProductOrStoreName(String search, Long userId, UserRoleEnum role, Pageable pageable , boolean isAsc) {
         List<ResponseOrderHistoryDTO> response = jpaQueryFactory.select(Projections.constructor(ResponseOrderHistoryDTO.class,
                         order.orderId,
                         order.user.id,
@@ -40,9 +41,11 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .leftJoin(orderDetail.product, product)
                 //  .leftJoin(product.store,store)
                 .where(
-                        order.user.id.eq(userId),
+                        isUserRole(role,userId),
+                        isOwnerRole(role,userId),
                         order.isDeleted.eq(false),
                         containsProductName(search)
+
                         //    ,containsStoreName(search)
                 )
                 .offset(pageable.getOffset())
@@ -50,12 +53,12 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .orderBy(isAsc ? order.updatedAt.desc() : order.updatedAt.asc())
                 .fetch();
 
-        JPAQuery<Long> query = getTotalCount(userId, search);
+        JPAQuery<Long> query = getTotalCount(userId, role, search);
 
         return PageableExecutionUtils.getPage(response, pageable, () -> query.fetchOne());
     }
 
-    JPAQuery<Long> getTotalCount(Long userId, String search) {
+    JPAQuery<Long> getTotalCount(Long userId, UserRoleEnum role, String search) {
         return jpaQueryFactory
                 .select(order.count())  // 👉 전체 개수 조회
                 .from(order)
@@ -63,8 +66,10 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .leftJoin(orderDetail.product, product)
                 //  .leftJoin(product.store, store)
                 .where(
-                        order.user.id.eq(userId),
+                        isUserRole(role,userId),
+                        isOwnerRole(role,userId),
                         containsProductName(search)
+
                         //            ,containsStoreName(search)
                 );
     }
@@ -75,6 +80,11 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     private BooleanExpression containsProductName(String productName) {
         return (productName != null && !productName.isEmpty()) ? QProduct.product.productName.contains(productName) : null;
     }
-
+    private BooleanExpression isUserRole(UserRoleEnum role, Long userId) {
+        return (role != null && !role.equals(UserRoleEnum.USER)) ?  order.user.id.eq(userId) : null;
+    }
+    private BooleanExpression isOwnerRole(UserRoleEnum role, Long userId) {
+        return (role != null && !role.equals(UserRoleEnum.OWNER)) ?  order.user.id.eq(userId) : null;
+    }
 
 }

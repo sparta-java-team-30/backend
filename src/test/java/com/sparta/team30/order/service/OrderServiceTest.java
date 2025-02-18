@@ -10,6 +10,7 @@ import com.sparta.team30.order.repository.OrderDetailRepository;
 import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.products.domain.Product;
 import com.sparta.team30.products.repository.ProductRepository;
+import com.sparta.team30.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,8 @@ class OrderServiceTest {
             );
             requestCreateOrderDTO.setProductList(productDTOList);
             List<UUID> productIdList = List.of(UUID.randomUUID(),UUID.randomUUID());
-            Order mockOrder = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY, 10000);
+            User user = User.builder().username("test").build();
+            Order mockOrder = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY, 10000, user);
             Product mockProduct = new Product();
             List<Product> mockProductList = List.of(mockProduct);
 
@@ -70,7 +72,7 @@ class OrderServiceTest {
             doNothing().when(orderDetailService).addOrderProducts(any(Order.class), anyList());
 
             //when
-            ResponseCreateOrderDTO responseCreateOrderDTO = orderService.addOrder(requestCreateOrderDTO);
+            ResponseCreateOrderDTO responseCreateOrderDTO = orderService.addOrder(user.getUsername(),requestCreateOrderDTO);
 
             //then
             assertEquals("주문이 완료되었습니다.", responseCreateOrderDTO.getMessage());
@@ -83,10 +85,11 @@ class OrderServiceTest {
             List<RequestOrderProductDTO> productList = new ArrayList<>();
 
             requestCreateOrderDTO.setProductList(productList);
-            Order mockOrder = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY,0);
-
+            User user = User.builder().username("test").build();
             //when-then
-            assertThrows(IllegalArgumentException.class, () -> orderService.addOrder(requestCreateOrderDTO));
+            Order mockOrder = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY,0, user);
+
+            assertThrows(IllegalArgumentException.class, () -> orderService.addOrder(user.getUsername(),requestCreateOrderDTO));
         }
     }
 

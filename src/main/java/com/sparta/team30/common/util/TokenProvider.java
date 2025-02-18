@@ -6,23 +6,19 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class TokenProvider {
-
     private final JwtProperties jwtProperties;
 
     public String generateToken(User user, Duration expiredAt){
@@ -62,32 +58,6 @@ public class TokenProvider {
         }
     }
 
-    public Authentication getAuthentication(String token){
-        Claims claims = getClaims(token);
-        Collection<? extends GrantedAuthority> authorities = extractAuthorities(claims);
-
-        return new UsernamePasswordAuthenticationToken(
-                new org.springframework.security.core.userdetails.User(claims.getSubject(),
-                        "",authorities), token, authorities);
-    }
-
-    // claim에 등록된 authorities 가져오기
-    private Collection<? extends GrantedAuthority> extractAuthorities (Claims claims){
-        Object authoritiesClaim  = claims.get("authorities");
-
-        if (authoritiesClaim instanceof String) {
-            List<String> authorities = Arrays.asList(((String) authoritiesClaim).split(","));
-            return authorities.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-        } else if (authoritiesClaim instanceof List) {
-            return ((List<String>) authoritiesClaim).stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-        }
-        return Collections.emptyList();
-    }
-
     private Claims getClaims(String token) {
         return Jwts.parser() // claim 조회
                 .verifyWith(getSecretKey())
@@ -98,5 +68,9 @@ public class TokenProvider {
 
     private SecretKey getSecretKey() {
         return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String getUsername(String token) {
+        return getClaims(token).getSubject();
     }
 }
