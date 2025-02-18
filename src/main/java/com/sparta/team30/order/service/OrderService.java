@@ -78,14 +78,14 @@ public class OrderService {
 
     public Page<ResponseOrderHistoryDTO> getOrderHistory(
       // User user,
-        String search, int page, int size, String sortBy, boolean isAsc) {
+        String search, int page, int size,  boolean isAsc) {
         Sort.Direction direction= isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, sortBy);
+        Sort sort = Sort.by(direction, "createdAt");
         Pageable pageable = PageRequest.of(page, size, sort);
 
         // USER는 본인 주문 내역 조회, //MANAGER는 모든 사용자 주문 내역 조회 ( 추가 예정 )
         //사용자 주문 내역 조회 ( 임시로 1L )
-        Page<ResponseOrderHistoryDTO> orderHistoryList = orderRepository.findByUserIdAndProductOrStoreName(search, 1L, pageable);
+        Page<ResponseOrderHistoryDTO> orderHistoryList = orderRepository.findByUserIdAndProductOrStoreName(search, 1L, pageable, isAsc);
         return orderHistoryList;
     }
 

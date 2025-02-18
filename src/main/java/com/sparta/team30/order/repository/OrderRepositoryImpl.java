@@ -25,7 +25,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     QProduct product = QProduct.product;
     QStore store = QStore.store;
 
-    public Page<ResponseOrderHistoryDTO> findByUserIdAndProductOrStoreName(String search, Long userId, Pageable pageable) {
+    public Page<ResponseOrderHistoryDTO> findByUserIdAndProductOrStoreName(String search, Long userId, Pageable pageable ,boolean isAsc) {
         List<ResponseOrderHistoryDTO> response = jpaQueryFactory.select(Projections.constructor(ResponseOrderHistoryDTO.class,
                         order.orderId,
                         order.user.id,
@@ -36,16 +36,18 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         //  product.store.storeName
                 ))
                 .from(order)
-                .leftJoin(order.orderDetails,orderDetail)
-                .leftJoin(orderDetail.product,product)
-              //  .leftJoin(product.store,store)
+                .leftJoin(order.orderDetails, orderDetail)
+                .leftJoin(orderDetail.product, product)
+                //  .leftJoin(product.store,store)
                 .where(
                         order.user.id.eq(userId),
+                        order.isDeleted.eq(false),
                         containsProductName(search)
-                    //    ,containsStoreName(search)
+                        //    ,containsStoreName(search)
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(isAsc ? order.updatedAt.desc() : order.updatedAt.asc())
                 .fetch();
 
         JPAQuery<Long> query = getTotalCount(userId, search);

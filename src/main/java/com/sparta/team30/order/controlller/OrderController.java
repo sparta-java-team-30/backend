@@ -41,12 +41,12 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<Page> getOrderList(//@AuthenticationPrincipal UserDetailsImpl userDetails,
                       @RequestParam("page") int page,
-                      @RequestParam("size") int size,
-                      @RequestParam("sortBy") String sortBy,
+                      @RequestParam(value = "size", defaultValue = "10") int size,
+                //      @RequestParam("sortBy") String sortBy,
                       @RequestParam("isAsc") boolean isAsc,
-                      @RequestParam("search") String search) {
+                      @RequestParam(value = "search", required = false) String search) {
         //String username = userDetails.getUsername();
-        Page<ResponseOrderHistoryDTO> orderHistory = orderService.getOrderHistory(search, page, size, sortBy, isAsc);
+        Page<ResponseOrderHistoryDTO> orderHistory = orderService.getOrderHistory(search, page, size, isAsc);
         return ResponseEntity.ok(orderHistory);
     }
 

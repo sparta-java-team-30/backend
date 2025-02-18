@@ -31,7 +31,10 @@ public class OrderDetailRepositoryImpl implements OrderDetailRepositoryCustom {
                         orderDetail.count.multiply(product.price)
                 )).from(orderDetail)
                 .leftJoin(orderDetail.product, product)
-                .where(orderDetail.order.orderId.eq(orderId))
+                .where(
+                        orderDetail.order.orderId.eq(orderId),
+                        orderDetail.isDeleted.eq(false)
+                        )
                 .fetch();
 
         return productDTOList;
