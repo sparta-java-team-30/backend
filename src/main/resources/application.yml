@@ -22,3 +22,6 @@ springdoc:
   default-consumes-media-type: application/json
   paths-to-match:
     - /api/**
+jwt:
+  issuer: "team30"
+  secretKey: "c3ByaW5nX2V4X3RlYW1fMzBfZmlyc3RfcHJvamVjdA=="
