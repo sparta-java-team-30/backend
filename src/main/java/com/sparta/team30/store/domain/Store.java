@@ -55,4 +55,22 @@ public class Store extends BaseEntity {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
+    public void addReviewScore(double score) {
+        if (this.storeReviewCount == 0) {
+            // 첫 리뷰
+            // score를 소수점 한 자리로 반올림 후 저장
+            double roundedScore = Math.round(score * 10) / 10.0;
+            this.storeGrade = roundedScore;
+            this.storeReviewCount = 1;
+        } else {
+            // 기존 리뷰가 있는 경우
+            double newAverage =
+                    ((this.storeGrade * this.storeReviewCount) + score) / (this.storeReviewCount + 1);
+            // 계산된 평균을 소수점 한 자리로 반올림
+            double roundedAverage = Math.round(newAverage * 10) / 10.0;
+            this.storeGrade = roundedAverage;
+            this.storeReviewCount++;
+        }
+    }
+
 }

@@ -1,27 +1,30 @@
 package com.sparta.team30.review.domain;
 
 import com.sparta.team30.common.domain.BaseEntity;
+import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.store.domain.Store;
 import com.sparta.team30.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 import java.util.UUID;
 
 @Entity
 @Getter
+@NoArgsConstructor
 @Table(name = "p_review")
-public class review extends BaseEntity {
+public class Review extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(nullable = false , updatable = false, unique = true )
+    @Column(nullable = false, updatable = false, unique = true)
     private UUID reviewId;
 
-    @Column(nullable = false,columnDefinition = "INTEGER CHECK (score BETWEEN 1 AND 5)")
-    private Integer score;
+    @Column(nullable = false, columnDefinition = "INTEGER CHECK (score BETWEEN 1 AND 5)")
+    private int score;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String content;
 
     @Column(nullable = false)
@@ -29,14 +32,25 @@ public class review extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    private User id;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Store storeId;
-    /*
+
     @OneToOne(fetch = FetchType.LAZY)
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private Order orderId;
-    */
+
+    public Review(int score, String content, Store store, Order order,User user) {
+        this.score = score;
+        this.content = content;
+        this.storeId = store;
+        this.orderId = order;
+        this.isDeleted = false;
+        this.user = user;
+    }
+
+
+
 }
