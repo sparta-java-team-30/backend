@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,4 +30,13 @@ public class CategoryController {
         CategoryResponseDto response = categoryService.createCategory(requestDto);
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/categories/{uuid}")
+//    @Secured({"ROLE_MANAGER", "ROLE_MASTER"})
+    public ResponseEntity<CategoryResponseDto> updateCategory (@PathVariable UUID uuid, @RequestBody @Valid CategoryRequestDto requestDto) {
+        CategoryResponseDto response = categoryService.updateCategory(uuid, requestDto);
+        return ResponseEntity.ok(response);
+    }
+
+
 }
