@@ -3,11 +3,13 @@ package com.sparta.team30.order.domain;
 import com.sparta.team30.address.domain.Address;
 import com.sparta.team30.common.domain.BaseEntity;
 import com.sparta.team30.order.dto.RequestCreateOrderDTO;
+import com.sparta.team30.order.dto.RequestUpdateOrderDTO;
 import com.sparta.team30.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,5 +66,17 @@ public class Order extends BaseEntity {
         this.price = price;
         //this.user = user;
         //this.address = address;
+    }
+
+    public void update(RequestUpdateOrderDTO orderDTO
+                       //,Address address
+    )
+    {
+        this.comment = orderDTO.getComment();
+        //this.address = address
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }
