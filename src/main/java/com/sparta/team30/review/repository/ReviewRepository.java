@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
     //중복
-    boolean existsByOrderId(Order orderId);
+    boolean existsByOrderId(UUID orderId);
 }

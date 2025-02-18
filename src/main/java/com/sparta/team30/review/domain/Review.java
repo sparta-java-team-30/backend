@@ -42,27 +42,15 @@ public class Review extends BaseEntity {
     @JoinColumn(nullable = false)
     private Order orderId;
 
-    public Review(int score, String content, User user, Store store, Order order) {
+    public Review(int score, String content, Store store, Order order,User user) {
         this.score = score;
         this.content = content;
-        this.user = user;
         this.storeId = store;
         this.orderId = order;
         this.isDeleted = false;
+        this.user = user;
     }
 
-    // 새로 추가된 생성자
-    public Review(UUID reviewId, int score, String content, User user, Store store, Order order) {
-
-            this.reviewId = reviewId;
-            this.score = score;
-            this.content = content;
-            this.user = user;
-            this.storeId = store;
-            this.orderId = order;
-            this.isDeleted = false;
 
 
-
-    }
 }
