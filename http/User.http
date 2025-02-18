@@ -1,0 +1,14 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=IntelliJ IDEA
+
+### POST User Signup
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+    "username": "user1",
+    "password": "Password1!",
+    "email": "email1@email.com",
+    "nickname": "myuser"
+}
