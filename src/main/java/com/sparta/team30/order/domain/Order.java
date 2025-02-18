@@ -1,12 +1,13 @@
 package com.sparta.team30.order.domain;
 
+import com.sparta.team30.address.domain.Address;
 import com.sparta.team30.common.domain.BaseEntity;
+import com.sparta.team30.order.dto.RequestCreateOrderDTO;
 import com.sparta.team30.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +20,7 @@ public class Order extends BaseEntity {
     @Column(name = "order_id")
     private UUID orderId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "order_type", nullable = false)
     private OrderTypeEnum orderType;
 
@@ -32,10 +34,26 @@ public class Order extends BaseEntity {
     private Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id"
+            //,nullable = false
+    )
     private User user;
 
-  /*  @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", nullable = false)
-    private Address address;*/
+   @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id"
+   //,nullable = false
+    )
+    private Address address;
+
+    public Order(RequestCreateOrderDTO requestCreateOrderDTO, OrderTypeEnum orderType
+                 //User user,
+                 //Address address
+                 ) {
+        this.orderType = orderType;
+        this.comment = requestCreateOrderDTO.getComment();
+        this.orderStatus = "결제 전";
+        this.isDeleted = false;
+        //this.user = user;
+        //this.address = address;
+    }
 }

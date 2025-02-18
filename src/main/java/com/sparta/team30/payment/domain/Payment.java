@@ -29,6 +29,7 @@ public class Payment extends BaseEntity {
     @Column(name = "payment_count", nullable = false)
     private int paymentCount;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     private PaymentTypeEnum paymentTypeEnum;
 
