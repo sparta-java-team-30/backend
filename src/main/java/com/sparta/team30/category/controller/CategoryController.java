@@ -38,5 +38,14 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/categories/{uuid}")
+//    @Secured({"ROLE_MANAGER", "ROLE_MASTER"})
+    public ResponseEntity<CategoryResponseDto> deleteCategory (@PathVariable UUID uuid) {
+//        public ResponseEntity<CategoryResponseDto> deleteCategory (@PathVariable UUID uuid, @AuthenticationPrincipal UserDetails userDetails) {
+//        CategoryResponseDto response = categoryService.deleteCategory(uuid, userDetails.getUsername());
+        CategoryResponseDto response = categoryService.deleteCategory(uuid, "tempUser");
+        return ResponseEntity.ok(response);
+    }
+
 
 }

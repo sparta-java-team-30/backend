@@ -43,4 +43,10 @@ public abstract class BaseEntity {
     @Column(name = "deleted_by")
     private String deletedBy;
 
+    // 삭제
+    public void delete(String deletedBy) {
+        this.deletedAt = LocalDateTime.now();
+        this.deletedBy = deletedBy;
+    }
+
 }

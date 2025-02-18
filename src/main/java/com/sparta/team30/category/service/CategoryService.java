@@ -51,4 +51,18 @@ public class CategoryService {
         category.update(requestDto);
         return new CategoryResponseDto(category);
     }
+
+    @Transactional
+    public CategoryResponseDto deleteCategory(UUID uuid, String deletedBy) {
+        Category category = categoryRepository.findById(uuid).orElseThrow(() ->
+                new CategoryNotFoundException(messageSource.getMessage(
+                        "not.found.category",
+                        null,
+                        "Not Found Category",
+                        Locale.getDefault()
+                ))
+        );
+        category.delete(deletedBy);
+        return new CategoryResponseDto(category);
+    }
 }

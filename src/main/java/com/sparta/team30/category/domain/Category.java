@@ -9,6 +9,8 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -36,5 +38,11 @@ public class Category extends BaseEntity {
 
     public void update(CategoryRequestDto requestDto) {
         this.categoryName = requestDto.getCategoryName();
+    }
+
+    @Override
+    public void delete(String deletedBy) {
+        super.delete(deletedBy);
+        this.isDeleted = true;
     }
 }
