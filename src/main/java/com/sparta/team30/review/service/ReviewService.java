@@ -26,9 +26,6 @@ public class ReviewService {
     //등록
     @Transactional
     public Review addReview(ReviewRequestDto reviewRequestDto , User user) {
-
-
-
         Order order = findOrderById(reviewRequestDto.getOrderId());
         Store store = findStoreById(reviewRequestDto.getStoreId());
         validateReviewUniqueness(order);
@@ -44,6 +41,11 @@ public class ReviewService {
                 order,
                 user
         );
+
+        // 음식점 리뷰 최초 등록 시 누적평균 평점 초기화
+        // 이후 리뷰가 추가될 경우 누적평균을 업데이트 함.
+        store.addReviewScore(reviewRequestDto.getScore());
+
         return reviewRepository.save(review);
     }
 
