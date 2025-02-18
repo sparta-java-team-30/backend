@@ -3,6 +3,7 @@ package com.sparta.team30.infrastructure.config;
 import com.sparta.team30.common.util.TokenProvider;
 import com.sparta.team30.infrastructure.security.TokenAuthenticationFilter;
 import com.sparta.team30.infrastructure.security.TokenGenerateFilter;
+import com.sparta.team30.infrastructure.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
     private final TokenProvider tokenProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -53,7 +55,7 @@ public class WebSecurityConfig {
 
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter(){
-        return new TokenAuthenticationFilter(tokenProvider);
+        return new TokenAuthenticationFilter(tokenProvider, userDetailsService);
     }
 
     @Bean

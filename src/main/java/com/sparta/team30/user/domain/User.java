@@ -44,4 +44,12 @@ public class User extends BaseEntity {
         this.isPublic = isPublic;
         this.role = role;
     }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

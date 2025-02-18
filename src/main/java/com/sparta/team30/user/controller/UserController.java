@@ -1,5 +1,7 @@
 package com.sparta.team30.user.controller;
 
+import com.sparta.team30.infrastructure.security.UserDetailsImpl;
+import com.sparta.team30.user.dto.UserInfoUpdateRequestDto;
 import com.sparta.team30.user.dto.UserSignInRequestDto;
 import com.sparta.team30.user.dto.UserSignUpRequestDto;
 import com.sparta.team30.user.service.UserServiceImpl;
@@ -10,10 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -37,6 +37,13 @@ public class UserController {
     @ApiResponse(responseCode = "401", description = "올바른 회원 정보가 아님")
     @PostMapping("/signin")
     public ResponseEntity<Void> signin(@RequestBody @Valid UserSignInRequestDto userSignInRequestDto) {
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping
+    public ResponseEntity<Void> updateUserInfo (@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                @RequestBody @Valid UserInfoUpdateRequestDto userInfoUpdateRequestDto) {
+        userService.userInfoUpdate(userDetails, userInfoUpdateRequestDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
