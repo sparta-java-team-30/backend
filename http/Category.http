@@ -1,0 +1,22 @@
+### Category
+### GET Category
+GET http://localhost:8080/api/categories
+
+### POST Category
+PUT http://localhost:8080/api/categories
+Content-Type: application/json
+
+{
+  "categoryName": "한식"
+}
+
+### PUT category
+PUT http://localhost:8080/api/categories/{uuid}
+Content-Type: application/json
+
+{
+  "categoryName": "중식"
+}
+
+### DELETE category
+DELETE http://localhost:8080/api/categories/{uuid}
