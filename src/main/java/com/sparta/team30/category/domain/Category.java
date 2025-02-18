@@ -1,5 +1,6 @@
 package com.sparta.team30.category.domain;
 
+import com.sparta.team30.category.dto.CategoryRequestDto;
 import com.sparta.team30.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,6 +9,8 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -29,4 +32,17 @@ public class Category extends BaseEntity {
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDeleted = false;
 
+    public Category(CategoryRequestDto requestDto) {
+        this.categoryName = requestDto.getCategoryName();
+    }
+
+    public void update(CategoryRequestDto requestDto) {
+        this.categoryName = requestDto.getCategoryName();
+    }
+
+    @Override
+    public void delete(String deletedBy) {
+        super.delete(deletedBy);
+        this.isDeleted = true;
+    }
 }
