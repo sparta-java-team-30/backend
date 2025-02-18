@@ -55,16 +55,15 @@ public class Order extends BaseEntity {
     )
     private Address address;
 
-    public Order(RequestCreateOrderDTO requestCreateOrderDTO, OrderTypeEnum orderType,int price
-                 //User user,
-                 //Address address
+    public Order(RequestCreateOrderDTO requestCreateOrderDTO, OrderTypeEnum orderType,int price, User user
+                 //,Address address
                  ) {
         this.orderType = orderType;
         this.comment = requestCreateOrderDTO.getComment();
         this.orderStatus = "결제 전";
         this.isDeleted = false;
         this.price = price;
-        //this.user = user;
+        this.user = user;
         //this.address = address;
     }
 

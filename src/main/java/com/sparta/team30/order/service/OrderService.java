@@ -1,5 +1,6 @@
 package com.sparta.team30.order.service;
 
+import com.sparta.team30.common.exception.OrderAccessDeniedException;
 import com.sparta.team30.common.exception.OrderAlreadyProcessedException;
 import com.sparta.team30.common.exception.OrderNotFoundException;
 import com.sparta.team30.order.domain.Order;
@@ -8,12 +9,17 @@ import com.sparta.team30.order.dto.*;
 import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.products.domain.Product;
 import com.sparta.team30.products.repository.ProductRepository;
+import com.sparta.team30.user.domain.User;
 import com.sparta.team30.user.domain.UserRoleEnum;
+import com.sparta.team30.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -26,18 +32,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final OrderDetailService orderDetailService;
+    private final UserRepository userRepository;
   //  private final AddressRepository addressRepository;
     @Transactional
-    public ResponseCreateOrderDTO addOrder(//User user,
+    public ResponseCreateOrderDTO addOrder(String username,
                                 RequestCreateOrderDTO requestCreateOrderDTO) {
 
-        //고객 = 배달, 가게 주인 = 포장. 추후 추가 예정.
-        /*User user;
+        //고객 = 배달, 가게 주인 = 포장
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Not found " + username));
         UserRoleEnum role = user.getRole();
         OrderTypeEnum orderType = OrderTypeEnum.DELIVERY;
         if(role.getAuthority().equals("ROLE_ADMIN")) {
             orderType = OrderTypeEnum.PICKUP;
-        }*/
+        }
 
         //고객 주소
         //Address address = addressRepository.findByUser(user);
@@ -58,8 +65,8 @@ public class OrderService {
         for (RequestOrderProductDTO product : productDTOList) {
             totalPrice+=product.getPrice()*product.getQuantity();
         }
-        Order order = new Order(requestCreateOrderDTO,OrderTypeEnum.DELIVERY, totalPrice
-                //user,
+        Order order = new Order(requestCreateOrderDTO,orderType, totalPrice,
+                user
                 //address
                 );
         orderRepository.save(order);
@@ -80,32 +87,39 @@ public class OrderService {
     }
 
     public Page<ResponseOrderHistoryDTO> getOrderHistory(
-      // User user,
+        UserDetails userDetails,
         String search, int page, int size,  boolean isAsc) {
         Sort.Direction direction= isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, "createdAt");
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        // USER는 본인 주문 내역 조회, //MANAGER는 모든 사용자 주문 내역 조회 ( 추가 예정 )
-        //사용자 주문 내역 조회 ( 임시로 1L )
-        Page<ResponseOrderHistoryDTO> orderHistoryList = orderRepository.findByUserIdAndProductOrStoreName(search, 1L, pageable, isAsc);
+        // USER는 본인 주문 내역 조회, //MANAGER는 모든 사용자 주문 내역 조회
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Not found " + userDetails.getUsername()));
+
+        Page<ResponseOrderHistoryDTO> orderHistoryList = orderRepository.findByUserIdAndProductOrStoreName(search, user.getId(), user.getRole(), pageable, isAsc);
         return orderHistoryList;
     }
 
-    public ResponseOrderDetailsDTO getOrderDetails(UUID orderId) {
+    public ResponseOrderDetailsDTO getOrderDetails(UserDetails userDetails, UUID orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
 
+        if(!order.getUser().getUsername().equals(userDetails.getUsername())){
+            throw new OrderAccessDeniedException("권한이 없습니다.");
+        }
         List<ResponseOrderProductDTO> orderProductList = orderDetailService.getOrderProductList(orderId);
 
         return new ResponseOrderDetailsDTO(order,orderProductList);
     }
 
     @Transactional
-    public void updateOrder(UUID orderId, RequestUpdateOrderDTO orderDTO) {
+    public void updateOrder(UserDetails userDetails, UUID orderId, RequestUpdateOrderDTO orderDTO) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("존재하지 않는 주문입니다."));
 
-        if(order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)))
-                //&& order.getUser().getRole().equals(UserRoleEnum.USER))  //사용자는 5분 이내
+        if(!order.getUser().getUsername().equals(userDetails.getUsername())){
+            throw new OrderAccessDeniedException("권한이 없습니다.");
+        }
+
+        if(order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)) && order.getUser().getRole().equals(UserRoleEnum.USER))  //사용자는 5분 이내
         {
             throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(5분 초과)");
         }
@@ -117,12 +131,15 @@ public class OrderService {
     }
 
     @Transactional
-    public void deleteOrder(UUID orderId) {
+    public void deleteOrder(UserDetails userDetails, UUID orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("존재하지 않는 주문입니다."));
 
-        if(order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5))
-            //&& order.getUser().getRole().equals(UserRoleEnum.USER))  //사용자는 5분 이내
-        ) {
+        if(!order.getUser().getUsername().equals(userDetails.getUsername())){
+            throw new OrderAccessDeniedException("권한이 없습니다.");
+        }
+
+        if(order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)) && order.getUser().getRole().equals(UserRoleEnum.USER)) //사용자는 5분 이내
+         {
             throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(5분 초과)");
         }
 
