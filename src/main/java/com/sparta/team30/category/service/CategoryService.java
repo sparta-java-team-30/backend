@@ -1,8 +1,10 @@
 package com.sparta.team30.category.service;
 
 import com.sparta.team30.category.domain.Category;
+import com.sparta.team30.category.dto.CategoryRequestDto;
 import com.sparta.team30.category.dto.CategoryResponseDto;
 import com.sparta.team30.category.respository.CategoryRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -25,5 +27,10 @@ public class CategoryService {
             categoryResponseDtoList.add(new CategoryResponseDto(c));
         }
         return categoryResponseDtoList;
+    }
+
+    public CategoryResponseDto createCategory(CategoryRequestDto requestDto) {
+        Category category = categoryRepository.save(new Category(requestDto));
+        return new CategoryResponseDto(category);
     }
 }

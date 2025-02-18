@@ -1,5 +1,6 @@
 package com.sparta.team30.category.domain;
 
+import com.sparta.team30.category.dto.CategoryRequestDto;
 import com.sparta.team30.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -29,4 +30,7 @@ public class Category extends BaseEntity {
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDeleted = false;
 
+    public Category(CategoryRequestDto requestDto) {
+        this.categoryName = requestDto.getCategoryName();
+    }
 }
