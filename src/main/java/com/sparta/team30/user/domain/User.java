@@ -1,7 +1,9 @@
 package com.sparta.team30.user.domain;
 
+import com.sparta.team30.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,21 +11,37 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_user")
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column(name = "username", nullable = false, unique = true, length = 100)
+    private String username;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
 
-    @Column(nullable = false)
+    @Column(name = "nickname", nullable = false, length = 100)
     private String nickname;
 
-    @Column
+    @Column(name = "email", nullable = false, unique = true, length = 255)
+    private String email;
+
+    @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRoleEnum role;
+
+    @Builder
+    public User(String email, String username, String password, String nickname, Boolean isPublic, UserRoleEnum role) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.isPublic = isPublic;
+        this.role = role;
+    }
 }
