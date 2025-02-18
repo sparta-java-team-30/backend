@@ -26,6 +26,9 @@ public class OrderDetail {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
+    @Column(name = "count")
+    private int count;
+
     public OrderDetail(Order order, Product product) {
         this.order = order;
         this.product = product;
