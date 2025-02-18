@@ -2,12 +2,14 @@ package com.sparta.team30.order.service;
 
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.domain.OrderDetail;
+import com.sparta.team30.order.dto.ResponseOrderProductDTO;
 import com.sparta.team30.order.repository.OrderDetailRepository;
 import com.sparta.team30.products.domain.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,5 +24,10 @@ public class OrderDetailService {
                 new OrderDetail(order, product)).toList();
 
         orderDetailRepository.saveAll(orderDetailList);
+    }
+
+    public List<ResponseOrderProductDTO> getOrderProductList(UUID orderId) {
+
+        return orderDetailRepository.findByOrderId(orderId);
     }
 }

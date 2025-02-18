@@ -11,6 +11,7 @@ import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.products.domain.Product;
 import com.sparta.team30.products.repository.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -43,35 +44,60 @@ class OrderServiceTest {
     @Mock
     private OrderDetailService orderDetailService;
 
-    @Test
-    @DisplayName("주문 생성 성공 테스트")
-    void testAddOrderSuccess() {
-        // given
-        RequestCreateOrderDTO requestCreateOrderDTO = new RequestCreateOrderDTO();
-        List<RequestOrderProductDTO> productList = List.of(
-                new RequestOrderProductDTO(UUID.randomUUID(), "햄버거", 3, 2000),
-                new RequestOrderProductDTO(UUID.randomUUID(), "밥", 2, 2000)
-        );
-        requestCreateOrderDTO.setProductList(productList);
+    @Mock
+    private ProductRepository productRepository;
 
-        Order mockOrder = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY);
-        when(orderRepository.save(any(Order.class))).thenReturn(mockOrder);
-        doNothing().when(orderDetailService).addOrderProducts(any(Order.class), anyList());
-        ResponseCreateOrderDTO responseCreateOrderDTO = orderService.addOrder(requestCreateOrderDTO);
+    @Nested
+    @DisplayName("주문 생성 테스트")
+    class AddOrder{
+        @Test
+        void testAddOrderSuccess() {
 
-        assertEquals("주문이 완료되었습니다.", responseCreateOrderDTO.getMessage());
+            // given
+            RequestCreateOrderDTO requestCreateOrderDTO = new RequestCreateOrderDTO();
+            List<RequestOrderProductDTO> productDTOList = List.of(
+                    new RequestOrderProductDTO(UUID.randomUUID(), "햄버거", 3, 2000),
+                    new RequestOrderProductDTO(UUID.randomUUID(), "밥", 2, 2000)
+            );
+            requestCreateOrderDTO.setProductList(productDTOList);
+            List<UUID> productIdList = List.of(UUID.randomUUID(),UUID.randomUUID());
+            Order mockOrder = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY, 10000);
+            Product mockProduct = new Product();
+            List<Product> mockProductList = List.of(mockProduct);
+
+            when(orderRepository.save(any(Order.class))).thenReturn(mockOrder);
+            when(productRepository.findAllById(anyList())).thenReturn(mockProductList);
+            doNothing().when(orderDetailService).addOrderProducts(any(Order.class), anyList());
+
+            //when
+            ResponseCreateOrderDTO responseCreateOrderDTO = orderService.addOrder(requestCreateOrderDTO);
+
+            //then
+            assertEquals("주문이 완료되었습니다.", responseCreateOrderDTO.getMessage());
+        }
+
+        @Test
+        void testAddOrderFail() {
+            // given
+            RequestCreateOrderDTO requestCreateOrderDTO = new RequestCreateOrderDTO();
+            List<RequestOrderProductDTO> productList = new ArrayList<>();
+
+            requestCreateOrderDTO.setProductList(productList);
+            Order mockOrder = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY,0);
+
+            //when-then
+            assertThrows(IllegalArgumentException.class, () -> orderService.addOrder(requestCreateOrderDTO));
+        }
     }
 
-    @Test
-    @DisplayName("주문 생성 실패 테스트")
-    void testAddOrderFail() {
-        // given
-        RequestCreateOrderDTO requestCreateOrderDTO = new RequestCreateOrderDTO();
-        List<RequestOrderProductDTO> productList = new ArrayList<>();
+    @Nested
+    @DisplayName("사용자 주문 내역 조회  테스트")
+    class GetOrder {
+        @Test
+        void testGetOrderListSuccess() {
 
-        requestCreateOrderDTO.setProductList(productList);
-        Order mockOrder = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY);
 
-        assertThrows(IllegalArgumentException.class, () -> orderService.addOrder(requestCreateOrderDTO));
+        }
     }
+
 }
