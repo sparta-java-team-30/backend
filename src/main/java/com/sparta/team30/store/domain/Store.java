@@ -43,13 +43,16 @@ public class Store extends BaseEntity {
     @Column(name = "store_address2")
     private String storeAddress2;
 
-    @Column(name = "store_grade", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
-    private int storeGrade = 0;
+    @Column(name = "store_grade", nullable = false)
+    private double storeGrade = 0.0;
 
-    @Column(name = "is_approved", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name ="store_review_count", nullable = false)
+    private int storeReviewCount = 0;
+
+    @Column(name = "is_approved", nullable = false)
     private Boolean isApproved = false;
 
-    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
 }
