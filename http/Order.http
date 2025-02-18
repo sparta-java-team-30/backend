@@ -1,0 +1,38 @@
+### ORDER
+### GET ORDER
+GET http://localhost:8080/api/orders
+
+
+
+### POST ORDER
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+
+{
+  "productList": [
+    {
+      "productId": "de0740a5-2deb-4f0a-80b8-70427a16ed51",
+      "productName": "햄버거",
+      "quantity": 2
+    },
+    {
+      "productId": "de0740a5-2deb-4f0a-80b8-70427a16ed52",
+      "productName": "콜라",
+      "quantity": 1
+    }
+  ],
+  "comment":"일회용품 필요 없어요."
+
+}
+
+### PATCH ORDER
+PATCH http://localhost:8080/api/orders/{order-id}
+Content-Type: application/json
+
+{
+  "comment":"일회용품 필요 없어요.",
+  "addressId":"de0740a5-2deb-4f0a-80b8-70427a16ed52"
+}
+
+### DELETE ORDER
+DELETE http://localhost:8080/api/orders/{order-id}
