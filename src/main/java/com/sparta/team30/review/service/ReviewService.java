@@ -62,7 +62,7 @@ public class ReviewService {
     }
 
     private void validateReviewUniqueness(Order order) {
-        if (reviewRepository.existsByOrderId(order.getOrderId())) {
+        if (reviewRepository.existsByOrderId(order)) {
             throw new IllegalArgumentException("해당 주문에 대한 리뷰가 존재합니다.");
         }
     }

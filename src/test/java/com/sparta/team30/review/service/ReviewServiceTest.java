@@ -73,7 +73,7 @@ public class ReviewServiceTest {
                     return Optional.of(dummyStore);
                 });
 
-        when(reviewRepository.existsByOrderId(orderId)).thenReturn(false);
+        when(reviewRepository.existsByOrderId(dummyOrder)).thenReturn(false);
         when(reviewRepository.save(any(Review.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
