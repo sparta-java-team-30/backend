@@ -46,6 +46,9 @@ public class Store extends BaseEntity {
     @Column(name = "store_grade", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
     private int storeGrade = 0;
 
+    @Column(name ="store_review_count", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    private int storeReviewCount = 0;
+
     @Column(name = "is_approved", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isApproved = false;
 
