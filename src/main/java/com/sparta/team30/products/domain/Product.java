@@ -34,6 +34,6 @@ public class Product extends BaseEntity {
     private boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", referencedColumnName = "storeId", nullable = false)
+    @JoinColumn(name = "store_id", referencedColumnName = "store_id", nullable = false)
     private Store store;
 }

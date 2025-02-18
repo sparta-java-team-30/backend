@@ -22,7 +22,6 @@ public class Cart {
 
     @Id
     @GeneratedValue(generator = "UUID")
-    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = "cart_id", updatable = false, nullable = false)
     private UUID cartId;
 
