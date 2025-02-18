@@ -1,6 +1,7 @@
 package com.sparta.team30.review.dto;
 
 
+import com.sparta.team30.review.domain.Review;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,6 @@ public class ReviewResponseDto {
     private String content;
 
 
+    public ReviewResponseDto(Review review) {
+    }
 }
