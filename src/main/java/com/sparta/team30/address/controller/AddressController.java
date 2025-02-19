@@ -6,7 +6,6 @@ import com.sparta.team30.address.dto.RequestUpdateAddressDTO;
 import com.sparta.team30.address.dto.ResponseAddressDTO;
 import com.sparta.team30.address.dto.ResponseAddressDetailsDTO;
 import com.sparta.team30.address.service.AddressService;
-import com.sparta.team30.address.tdo.RequestUpdateAddressDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,8 +37,8 @@ public class AddressController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String,String>> addAddress(@AuthenticationPrincipal UserDetails userDetails, @RequestBody RequestCreateAddressDTO requestCreateAddressDTO) {
-
+    public ResponseEntity<Map<String,String>> addAddress(@AuthenticationPrincipal UserDetails userDetails,
+                                                         @RequestBody RequestCreateAddressDTO requestCreateAddressDTO) {
         addressService.addAddress(userDetails, requestCreateAddressDTO);
 
         return ResponseEntity.ok(Map.of("message", "배송지 생성이 완료되었습니다."));

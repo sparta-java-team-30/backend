@@ -45,7 +45,7 @@ public class AddressService {
 
     public void addAddress(UserDetails userDetails, RequestCreateAddressDTO requestCreateAddressDTO) {
 
-        User user = userRepository.findByUsername(userDetails.getPassword()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
         addressRepository.save(new Address(user, requestCreateAddressDTO));
     }
 

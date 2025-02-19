@@ -2,11 +2,12 @@ package com.sparta.team30.payment.domain;
 
 import com.sparta.team30.common.domain.BaseEntity;
 import com.sparta.team30.order.domain.Order;
+import com.sparta.team30.payment.dto.RequestPaymentByOrderId;
+import com.sparta.team30.payment.dto.ResponsePGPaymentDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -31,7 +32,7 @@ public class Payment extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
-    private PaymentTypeEnum paymentTypeEnum;
+    private PaymentTypeEnum paymentStatus;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
@@ -40,4 +41,23 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
+    public Payment(Order order, RequestPaymentByOrderId requestPaymentByOrderId) {
+        this.paymentPrice = order.getPrice();
+        this.paymentType = requestPaymentByOrderId.getPaymentType();
+        this.paymentStatus = PaymentTypeEnum.PENDING;
+        this.order = order;
+        this.isDeleted = false;
+    }
+
+    public Boolean update(ResponsePGPaymentDTO responsePGPaymentDTO) {
+        if (responsePGPaymentDTO.isSuccess()) {
+            this.paymentStatus = PaymentTypeEnum.COMPLETED;
+            return true;
+        }
+        else{
+            this.paymentStatus = PaymentTypeEnum.FAILED;
+            return false;
+        }
+
+    }
 }

@@ -6,22 +6,28 @@ GET http://localhost:8080/api/addresses
 ### GET ADDRESSDETAIL
 GET http://localhost:8080/api/addresses/{address-id}
 
+
 ### POST ORDER
-POST http://localhost:8080/api/orders
+POST http://localhost:8080/api/addresses
 Content-Type: application/json
 
 
 {
-      "userPostcode" : "12345",
-      "userAddress1": "서울시 광화문",
-      "userAddress2": "ㅁㅁ동"
+  "userPostcode": "01234",
+  "userAddress1": "서울특별시 광화문 123",
+  "userAddress2": "ㅁㅁ동 ㅁㅁ호"
 }
 
+
 ### PATCH ADDRESS
-PATCH http://localhost:8080/api/orders/{address-id}
+PATCH http://localhost:8080/api/addresses/{address-id}
 Content-Type: application/json
 
-
+{
+  "userPostcode": "01234",
+  "userAddress1": "서울특별시 광화문 123",
+  "userAddress2": "ㅁㅁ동 ㅁㅁ호"
+}
 
 ### DELETE ADDRESS
 DELETE http://localhost:8080/api/orders/{address-id}
