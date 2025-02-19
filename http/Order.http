@@ -1,7 +1,10 @@
 ### ORDER
-### GET ORDER
+### GET ORDERLIST
 GET http://localhost:8080/api/orders
 
+
+### GET ORDERDETAIL
+GET http://localhost:8080/api/orders/{order-id}
 
 
 ### POST ORDER
