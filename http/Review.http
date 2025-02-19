@@ -1,4 +1,4 @@
-### GET request to example server
-GET GET http://localhost:8080/api/reviews
+### GET Review
+GET GET
 
 ###
