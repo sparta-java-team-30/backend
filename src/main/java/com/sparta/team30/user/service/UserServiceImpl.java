@@ -1,9 +1,11 @@
 package com.sparta.team30.user.service;
 
 import com.sparta.team30.common.exception.UserEmailAlreadyExistsException;
+import com.sparta.team30.common.exception.UserPasswordIncorrectException;
 import com.sparta.team30.common.exception.UsernameAlreadyExistsException;
 import com.sparta.team30.user.domain.User;
 import com.sparta.team30.user.domain.UserRoleEnum;
+import com.sparta.team30.user.dto.UserDeleteRequestDto;
 import com.sparta.team30.user.dto.UserInfoUpdateRequestDto;
 import com.sparta.team30.user.dto.UserSignUpRequestDto;
 import com.sparta.team30.user.repository.UserRepository;
@@ -50,10 +52,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void userInfoUpdate(UserDetails userDetails, UserInfoUpdateRequestDto userInfoUpdateRequestDto) {
-        String username = userDetails.getUsername();
+        String username = getUsername(userDetails);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 username을 찾을 수 없습니다."));
-
+        if (!user.getIsPublic().equals(userInfoUpdateRequestDto.getIsPublic())) {
+            user.updateIsPublic(userInfoUpdateRequestDto.getIsPublic());
+        }
         if (userInfoUpdateRequestDto.getEmail() != null) {
             if (isEmailDuplicated(userInfoUpdateRequestDto.getEmail())) {
                 throw new UserEmailAlreadyExistsException(userInfoUpdateRequestDto.getEmail() +
@@ -64,6 +68,22 @@ public class UserServiceImpl implements UserService {
         if (userInfoUpdateRequestDto.getNickname() != null) {
             user.updateNickname(userInfoUpdateRequestDto.getNickname());
         }
+    }
+
+    @Transactional
+    @Override
+    public void deleteUser(UserDetails userDetails, UserDeleteRequestDto userDeleteRequestDto) {
+        String username = getUsername(userDetails);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 username을 찾을 수 없습니다."));
+        if (!passwordEncoder.matches(userDeleteRequestDto.getPassword(), user.getPassword())) {
+            throw new UserPasswordIncorrectException("비밀번호가 일치하지 않습니다.");
+        }
+        user.deleteUser(username);
+    }
+
+    private String getUsername(UserDetails userDetails) {
+        return userDetails.getUsername();
     }
 
     private String encodePassword(String password) {

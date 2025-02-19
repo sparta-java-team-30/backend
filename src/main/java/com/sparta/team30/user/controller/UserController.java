@@ -1,6 +1,7 @@
 package com.sparta.team30.user.controller;
 
 import com.sparta.team30.infrastructure.security.UserDetailsImpl;
+import com.sparta.team30.user.dto.UserDeleteRequestDto;
 import com.sparta.team30.user.dto.UserInfoUpdateRequestDto;
 import com.sparta.team30.user.dto.UserSignInRequestDto;
 import com.sparta.team30.user.dto.UserSignUpRequestDto;
@@ -44,6 +45,13 @@ public class UserController {
     public ResponseEntity<Void> updateUserInfo (@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                 @RequestBody @Valid UserInfoUpdateRequestDto userInfoUpdateRequestDto) {
         userService.userInfoUpdate(userDetails, userInfoUpdateRequestDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUser (@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                            @RequestBody UserDeleteRequestDto userDeleteRequestDto) {
+        userService.deleteUser(userDetails, userDeleteRequestDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

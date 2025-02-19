@@ -52,4 +52,12 @@ public class User extends BaseEntity {
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public void updateIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
+    public void deleteUser(String deletedBy) {
+        super.delete(deletedBy);
+    }
 }
