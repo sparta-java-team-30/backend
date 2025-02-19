@@ -90,6 +90,6 @@ public class CartService {
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return cartItemRepository.findByCartId(cartId);
+        return cartItemRepository.findByCart_CartId(cartId, pageable);
     }
 }
