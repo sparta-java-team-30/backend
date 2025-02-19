@@ -7,7 +7,13 @@ import com.sparta.team30.carts.repository.CartRepository;
 import com.sparta.team30.user.domain.User;
 import com.sparta.team30.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -61,5 +67,29 @@ public class CartService {
         }
 
         cartRepository.save(cart);
+    }
+
+    public UUID getCartId(Long userId) {
+        Optional<Cart> cart = cartRepository.findByUserId(userId);
+        return cart.map(Cart::getCartId).orElse(null);
+    }
+
+    public UUID createCart(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        Cart cart = new Cart();
+        cart.setUser(user);
+
+        cartRepository.save(cart);
+        return cart.getCartId();
+    }
+
+    public Page<CartItem> getCartItems(UUID cartId, int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return cartItemRepository.findByCartId(cartId);
     }
 }
