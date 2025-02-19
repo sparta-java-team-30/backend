@@ -1,6 +1,7 @@
 package com.sparta.team30.address.domain;
 
 import com.sparta.team30.address.dto.RequestCreateAddressDTO;
+import com.sparta.team30.address.dto.RequestUpdateAddressDTO;
 import com.sparta.team30.common.domain.BaseEntity;
 import com.sparta.team30.user.domain.User;
 import jakarta.persistence.*;
@@ -41,5 +42,15 @@ public class Address extends BaseEntity {
         this.userPostcode = requestCreateAddressDTO.getUserPostcode();
         this.userAddress1 = requestCreateAddressDTO.getUserAddress1();
         this.userAddress2 = requestCreateAddressDTO.getUserAddress2();
+    }
+
+    public void update(RequestUpdateAddressDTO requestUpdateAddressDTO) {
+        this.userPostcode = requestUpdateAddressDTO.getUserPostcode();
+        this.userAddress1 = requestUpdateAddressDTO.getUserAddress1();
+        this.userAddress2 = requestUpdateAddressDTO.getUserAddress2();
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }

@@ -137,4 +137,14 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+    @ExceptionHandler(AddressAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> AddressAccessDeniedException(OrderAccessDeniedException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_ACCEPTABLE.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_ACCEPTABLE
+        );
+    }
 }
