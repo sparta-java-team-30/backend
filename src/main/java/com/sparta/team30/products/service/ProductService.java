@@ -1,7 +1,8 @@
 package com.sparta.team30.products.service;
 
 import com.sparta.team30.products.domain.Product;
-import com.sparta.team30.products.dto.ProductDto;
+import com.sparta.team30.products.dto.ProductRequestDto;
+import com.sparta.team30.products.dto.ProductResponseDto;
 import com.sparta.team30.products.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -9,8 +10,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,42 +18,84 @@ import java.util.UUID;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public Product createProduct(ProductDto productDto) {
+    public ProductResponseDto createProduct(ProductRequestDto productRequestDto) {
         Product product = new Product();
-        product.setProductName(productDto.getProductName());
-        product.setPrice(productDto.getPrice());
-        //product.setStore(store);
 
-        return productRepository.save(product);
+        product.setProductName(productRequestDto.getProductName());
+        product.setPrice(productRequestDto.getPrice());
+
+//        Store store = storeRepository.findById(productRequestDto.getStoreId())
+//                .orElseThrow(() -> new IllegalArgumentException("가게 아이디를 찾을 수 없습니다. " + productRequestDto.getStoreId()));
+//        product.setStore(store);
+
+        Product savedProduct = productRepository.save(product);
+
+        ProductResponseDto productResponseDto = new ProductResponseDto();
+
+        productResponseDto.setProductId(savedProduct.getProductId());
+        productResponseDto.setProductName(savedProduct.getProductName());
+        productResponseDto.setPrice(savedProduct.getPrice());
+        productResponseDto.setStoreId(savedProduct.getStore().getStoreId());
+
+        return productResponseDto;
     }
 
-    public Page<Product> getAllProducts(int page, int size, String sortBy, boolean isAsc) {
+    public Page<ProductResponseDto> getAllProducts(int page, int size, String sortBy, boolean isAsc) {
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return productRepository.findAll(pageable);
+        Page<Product> productPage = productRepository.findAll(pageable);
+
+        Page<ProductResponseDto> productResponseDtoPage = productPage.map(product -> {
+            ProductResponseDto dto = new ProductResponseDto();
+            dto.setProductId(product.getProductId());
+            dto.setProductName(product.getProductName());
+            dto.setPrice(product.getPrice());
+            dto.setStoreId(product.getStore().getStoreId());
+            return dto;
+        });
+
+        return productResponseDtoPage;
     }
 
-    public Product getProductById(UUID productId) {
+    public ProductResponseDto getProductById(UUID productId) {
         Optional<Product> product = productRepository.findById(productId);
-        return product.orElse(null);
+
+        if (product.isPresent()) {
+            Product savedProduct = product.get();
+            ProductResponseDto productResponseDto = new ProductResponseDto();
+
+            productResponseDto.setProductId(savedProduct.getProductId());
+            productResponseDto.setProductName(savedProduct.getProductName());
+            productResponseDto.setPrice(savedProduct.getPrice());
+            productResponseDto.setStoreId(savedProduct.getStore().getStoreId());
+
+            return productResponseDto;
+        }
+
+        return null;
     }
 
-    public Product updateProduct(UUID productId, ProductDto productDto) {
+    public ProductResponseDto updateProduct(UUID productId, ProductRequestDto productRequestDto) {
         Optional<Product> existingProduct = productRepository.findById(productId);
         if (existingProduct.isPresent()) {
             Product product = existingProduct.get();
-            product.setProductName(productDto.getProductName());
-            product.setPrice(productDto.getPrice());
-            return productRepository.save(product);
+            product.setProductName(productRequestDto.getProductName());
+            product.setPrice(productRequestDto.getPrice());
+
+            Product updatedProduct = productRepository.save(product);
+
+            ProductResponseDto productResponseDto = new ProductResponseDto();
+            productResponseDto.setProductId(updatedProduct.getProductId());
+            productResponseDto.setProductName(updatedProduct.getProductName());
+            productResponseDto.setPrice(updatedProduct.getPrice());
+            productResponseDto.setStoreId(updatedProduct.getStore().getStoreId());
+
+            return productResponseDto;
         } else {
             return null;
         }
-    }
-
-    public void deleteAllProducts() {
-        productRepository.deleteAll();
     }
 
     public boolean deleteProduct(UUID productId) {
