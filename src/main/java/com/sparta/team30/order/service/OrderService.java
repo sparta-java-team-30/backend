@@ -93,10 +93,10 @@ public class OrderService {
         Sort sort = Sort.by(direction, "createdAt");
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        // USER는 본인 주문 내역 조회, //MANAGER는 모든 사용자 주문 내역 조회
+        // USER는 본인 주문 내역 조회, //OWNER는 본인 가게 주문만 조회, //MANAGER는 모든 사용자 주문 내역 조회
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Not found " + userDetails.getUsername()));
 
-        Page<ResponseOrderHistoryDTO> orderHistoryList = orderRepository.findByUserIdAndProductOrStoreName(search, user.getId(), user.getRole(), pageable, isAsc);
+        Page<ResponseOrderHistoryDTO> orderHistoryList = orderRepository.findByUserIdAndProductOrStoreName(search, user.getId(), user.getRole(),user.getUsername(), pageable, isAsc);
         return orderHistoryList;
     }
 
