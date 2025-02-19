@@ -36,8 +36,8 @@ public class AddressController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String,String>> addAddress(@AuthenticationPrincipal UserDetails userDetails, @RequestBody RequestCreateAddressDTO requestCreateAddressDTO) {
-
+    public ResponseEntity<Map<String,String>> addAddress(@AuthenticationPrincipal UserDetails userDetails,
+                                                         @RequestBody RequestCreateAddressDTO requestCreateAddressDTO) {
         addressService.addAddress(userDetails, requestCreateAddressDTO);
 
         return ResponseEntity.ok(Map.of("message", "배송지 생성이 완료되었습니다."));

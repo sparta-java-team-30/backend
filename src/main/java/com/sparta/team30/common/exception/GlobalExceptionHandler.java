@@ -138,13 +138,23 @@ public class GlobalExceptionHandler {
         );
     }
     @ExceptionHandler(AddressAccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> AddressAccessDeniedException(OrderAccessDeniedException e) {
+    public ResponseEntity<ErrorResponse> AddressAccessDeniedException(AddressAccessDeniedException e) {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
                         .statusCode(HttpStatus.NOT_ACCEPTABLE.value())
                         .message(e.getMessage())
                         .build(),
                 HttpStatus.NOT_ACCEPTABLE
+        );
+    }
+    @ExceptionHandler(AlreadyPaidException.class)
+    public ResponseEntity<ErrorResponse> AlreadyPaidException(AlreadyPaidException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.BAD_REQUEST
         );
     }
 }

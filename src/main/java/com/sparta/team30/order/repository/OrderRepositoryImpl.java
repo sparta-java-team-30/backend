@@ -7,6 +7,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.team30.order.domain.QOrder;
 import com.sparta.team30.order.domain.QOrderDetail;
 import com.sparta.team30.order.dto.ResponseOrderHistoryDTO;
+import com.sparta.team30.payment.domain.QPayment;
 import com.sparta.team30.products.domain.QProduct;
 import com.sparta.team30.store.domain.QStore;
 import com.sparta.team30.user.domain.UserRoleEnum;
@@ -25,7 +26,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     QOrderDetail orderDetail = QOrderDetail.orderDetail;
     QProduct product = QProduct.product;
     QStore store = QStore.store;
-
+    QPayment payment = QPayment.payment;
     public Page<ResponseOrderHistoryDTO> findByUserIdAndProductOrStoreName(String search, Long userId, UserRoleEnum role, String username, Pageable pageable , boolean isAsc) {
         List<ResponseOrderHistoryDTO> response = jpaQueryFactory.select(Projections.constructor(ResponseOrderHistoryDTO.class,
                         order.orderId,
@@ -33,16 +34,20 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         order.orderType,
                         order.updatedAt,
                         order.orderStatus,
-                        order.price
+                        order.price,
+                        payment.paymentType,
+                        payment.paymentStatus,
+                        payment.updatedAt.as("paymentAt")
                         //  product.store.storeName
                 ))
                 .from(order)
                 .leftJoin(order.orderDetails, orderDetail)
                 .leftJoin(orderDetail.product, product)
+                .leftJoin(order.payment,payment)
                 //  .leftJoin(product.store,store)
                 .where(
-                        isUserRole(role,userId),
-                        isOwnerRole(role,username),
+                        isUserRole(role, userId),
+                        isOwnerRole(role, username),
                         order.isDeleted.eq(false),
                         containsProductName(search)
 
@@ -64,6 +69,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .from(order)
                 .leftJoin(order.orderDetails, orderDetail)
                 .leftJoin(orderDetail.product, product)
+                .leftJoin(order.payment,payment)
                 //  .leftJoin(product.store, store)
                 .where(
                         isUserRole(role,userId),
@@ -81,10 +87,10 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         return (productName != null && !productName.isEmpty()) ? QProduct.product.productName.contains(productName) : null;
     }
     private BooleanExpression isUserRole(UserRoleEnum role, Long userId) {
-        return (role != null && !role.equals(UserRoleEnum.USER)) ?  order.user.id.eq(userId) : null;
+        return (role != null && role.equals(UserRoleEnum.USER)) ?  order.user.id.eq(userId) : null;
     }
     private BooleanExpression isOwnerRole(UserRoleEnum role, String username) {
-        return (role != null && !role.equals(UserRoleEnum.OWNER)) ?  store.createdBy.eq(username) : null;
+        return (role != null && role.equals(UserRoleEnum.OWNER)) ?  store.createdBy.eq(username) : null;
     }
 
 }

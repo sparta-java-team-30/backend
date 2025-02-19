@@ -4,6 +4,7 @@ import com.sparta.team30.address.domain.Address;
 import com.sparta.team30.common.domain.BaseEntity;
 import com.sparta.team30.order.dto.RequestCreateOrderDTO;
 import com.sparta.team30.order.dto.RequestUpdateOrderDTO;
+import com.sparta.team30.payment.domain.Payment;
 import com.sparta.team30.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -48,6 +49,8 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order")
     private List<OrderDetail> orderDetails;
 
+    @OneToMany(mappedBy = "order")
+    private List<Payment> payment;
 
    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id"
@@ -77,5 +80,9 @@ public class Order extends BaseEntity {
 
     public void setDeleted(Boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public void updateStatus(String orderStatus) {
+        this.orderStatus=orderStatus;
     }
 }

@@ -152,6 +152,7 @@ public class OrderService {
 
         order.delete(order.getUser().getUsername());
         order.setDeleted(true); //is_deleted 필드 변경
+        order.updateStatus("주문 취소");
     }
 
 
