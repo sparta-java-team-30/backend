@@ -1,5 +1,6 @@
 package com.sparta.team30.carts.domain;
 
+import com.sparta.team30.common.domain.BaseEntity;
 import com.sparta.team30.products.domain.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,10 +14,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name = "p_cart_item")
-public class CartItem {
+public class CartItem extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "cart_item_id")
     private UUID cartItemId;
 
