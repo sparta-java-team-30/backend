@@ -1,12 +1,10 @@
 package com.sparta.team30.address.controller;
 
-import com.sparta.team30.address.domain.Address;
 import com.sparta.team30.address.dto.RequestCreateAddressDTO;
 import com.sparta.team30.address.dto.RequestUpdateAddressDTO;
 import com.sparta.team30.address.dto.ResponseAddressDTO;
 import com.sparta.team30.address.dto.ResponseAddressDetailsDTO;
 import com.sparta.team30.address.service.AddressService;
-import com.sparta.team30.address.tdo.RequestUpdateAddressDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

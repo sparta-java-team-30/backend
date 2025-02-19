@@ -53,4 +53,12 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                 .execute();
     }
 
+    @Override
+    public Optional<User> findUserByUserId(String username) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(user)
+                .where(user.username.eq(username))
+                .fetchOne());
+    }
+
 }

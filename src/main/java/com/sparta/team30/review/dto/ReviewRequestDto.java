@@ -10,6 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewRequestDto {
+    private UUID reviewId;
     private UUID storeId;
     private UUID orderId;
     private Integer score;
