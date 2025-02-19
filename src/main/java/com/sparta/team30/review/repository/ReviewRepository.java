@@ -2,7 +2,6 @@ package com.sparta.team30.review.repository;
 
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.review.domain.Review;
-import com.sparta.team30.store.domain.Store;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

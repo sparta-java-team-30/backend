@@ -5,8 +5,6 @@ import com.sparta.team30.review.domain.Review;
 import com.sparta.team30.review.dto.ReviewRequestDto;
 import com.sparta.team30.review.dto.ReviewResponseDto;
 import com.sparta.team30.review.service.ReviewService;
-import com.sparta.team30.store.domain.Store;
-import com.sparta.team30.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
