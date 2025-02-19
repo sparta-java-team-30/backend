@@ -14,7 +14,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "p_review")
+@Table(name = "P_REVIEW")
 public class Review extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -51,10 +51,6 @@ public class Review extends BaseEntity {
         this.user = user;
     }
 
-    public void updateScoreAndContent(int newScore, String newContent) {
-        this.score = newScore;
-        this.content = newContent;
-    }
 
     public void deleteReview(String deletedBy) {
         super.delete(deletedBy);

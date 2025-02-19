@@ -46,12 +46,13 @@ public class ReviewController {
 
 //    //수정
 //    @PutMapping("/{}")
-//    public ResponseEntity<String> updateReview(@RequestBody ReviewRequestDto requestDto/*, @AuthenticationPrincipal UserDetails userDetails*/) {
-//         reviewService.updateReview(requestDto, user);
+//    public ResponseEntity<String> updateReview(@RequestBody ReviewRequestDto requestDto, @AuthenticationPrincipal UserDetails userDetails) {
+//        String username = userDetails.getUsername();
+//        reviewService.updateReview(requestDto, username);
 //        return ResponseEntity.ok("리뷰가 수정되었습니다.");
 //    }
-//
-//
+
+
     //소프트삭제
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<String> deleteReview(@PathVariable UUID reviewId, @AuthenticationPrincipal UserDetails userDetails) {
