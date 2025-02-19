@@ -19,19 +19,16 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     //N+1 방지 Fatch Join
     @Query("SELECT r FROM Review r " +
             "JOIN FETCH r.user " +
-            "WHERE r.storeId = :storeId AND r.isDeleted = false")
-    List<Review> findAllByStoreAndIsDeletedFalse(@Param("storeId") Store store);
-    List<Review> storeId(Store storeId);
+            "WHERE r.storeId.storeId = :storeId AND r.isDeleted = false")
+    List<Review> findAllByStoreAndIsDeletedFalse(@Param("storeId") UUID storeId);
 
-    Optional<Review> findByStoreIdAndIsDeletedFalse(Store storeId);
-
-    //소프트삭제 처리 
+//    //소프트삭제 처리
     @Modifying
     @Transactional
     @Query("update Review r SET r.isDeleted=true where r.reviewId= :reviewId")
     void deleteByReviewId(UUID reviewId);
 
-    //평점계산
-    Double calculatingAvgRating(UUID StoreId);
-    int countByStoreIdAndIsDeletedFalse(Store storeId);
+    Optional<Review> findByReviewIdAndIsDeletedFalse(UUID storeId);
+
+
 }

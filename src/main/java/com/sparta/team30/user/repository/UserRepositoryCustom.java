@@ -13,4 +13,6 @@ public interface UserRepositoryCustom {
     boolean existsByUsername(String username);
 
     void updateCreatedBy(String createdBy, Long id);
+
+    Optional<User> findUserByUserId(String username);
 }

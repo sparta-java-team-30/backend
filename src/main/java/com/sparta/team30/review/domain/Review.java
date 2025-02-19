@@ -51,6 +51,15 @@ public class Review extends BaseEntity {
         this.user = user;
     }
 
+    public void updateScoreAndContent(int newScore, String newContent) {
+        this.score = newScore;
+        this.content = newContent;
+    }
+
+    public void deleteReview(String deletedBy) {
+        super.delete(deletedBy);
+        this.isDeleted = true;
+    }
 
 
 }
