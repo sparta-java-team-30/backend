@@ -4,6 +4,7 @@ import com.sparta.team30.products.domain.Product;
 import com.sparta.team30.products.dto.ProductDto;
 import com.sparta.team30.products.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,13 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
+    public ResponseEntity<Page<Product>> getAllProducts(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("sortBy") String sortBy,
+            @RequestParam("isAsc") boolean isAsc
+    ) {
+        Page<Product> products = productService.getAllProducts(page - 1, size, sortBy, isAsc);
         return ResponseEntity.ok(products);
     }
 

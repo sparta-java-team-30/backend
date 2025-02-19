@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({UsernameAlreadyExistsException.class})
-    public ResponseEntity<ErrorResponse> usernameAlreadyExistsException (UsernameAlreadyExistsException e) {
+    public ResponseEntity<ErrorResponse> usernameAlreadyExistsException(UsernameAlreadyExistsException e) {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
                         .statusCode(HttpStatus.CONFLICT.value())
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({UserEmailAlreadyExistsException.class})
-    public ResponseEntity<ErrorResponse> userEmailAlreadyExistsException (UserEmailAlreadyExistsException e) {
+    public ResponseEntity<ErrorResponse> userEmailAlreadyExistsException(UserEmailAlreadyExistsException e) {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
                         .statusCode(HttpStatus.CONFLICT.value())
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({UserPasswordIncorrectException.class})
-    public ResponseEntity<ErrorResponse> userPasswordIncorrectException (UserPasswordIncorrectException e) {
+    public ResponseEntity<ErrorResponse> userPasswordIncorrectException(UserPasswordIncorrectException e) {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
                         .statusCode(HttpStatus.UNAUTHORIZED.value())
@@ -104,6 +104,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
+
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<ErrorResponse> OrderNotFoundException(OrderNotFoundException e) {
         return new ResponseEntity<>(
@@ -114,8 +115,30 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+
     @ExceptionHandler(OrderAccessDeniedException.class)
     public ResponseEntity<ErrorResponse> OrderAccessDeniedException(OrderAccessDeniedException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_ACCEPTABLE.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_ACCEPTABLE
+        );
+    }
+
+    @ExceptionHandler(AddressNotFoundException.class)
+    public ResponseEntity<ErrorResponse> AddressNotFoundException(AddressNotFoundException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_FOUND
+        );
+    }
+    @ExceptionHandler(AddressAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> AddressAccessDeniedException(OrderAccessDeniedException e) {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
                         .statusCode(HttpStatus.NOT_ACCEPTABLE.value())

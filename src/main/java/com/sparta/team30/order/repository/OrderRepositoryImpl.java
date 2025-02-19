@@ -26,7 +26,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     QProduct product = QProduct.product;
     QStore store = QStore.store;
 
-    public Page<ResponseOrderHistoryDTO> findByUserIdAndProductOrStoreName(String search, Long userId, UserRoleEnum role, Pageable pageable , boolean isAsc) {
+    public Page<ResponseOrderHistoryDTO> findByUserIdAndProductOrStoreName(String search, Long userId, UserRoleEnum role, String username, Pageable pageable , boolean isAsc) {
         List<ResponseOrderHistoryDTO> response = jpaQueryFactory.select(Projections.constructor(ResponseOrderHistoryDTO.class,
                         order.orderId,
                         order.user.id,
@@ -42,7 +42,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 //  .leftJoin(product.store,store)
                 .where(
                         isUserRole(role,userId),
-                        isOwnerRole(role,userId),
+                        isOwnerRole(role,username),
                         order.isDeleted.eq(false),
                         containsProductName(search)
 
@@ -53,21 +53,21 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .orderBy(isAsc ? order.updatedAt.desc() : order.updatedAt.asc())
                 .fetch();
 
-        JPAQuery<Long> query = getTotalCount(userId, role, search);
+        JPAQuery<Long> query = getTotalCount(userId, role, search, username);
 
         return PageableExecutionUtils.getPage(response, pageable, () -> query.fetchOne());
     }
 
-    JPAQuery<Long> getTotalCount(Long userId, UserRoleEnum role, String search) {
+    JPAQuery<Long> getTotalCount(Long userId, UserRoleEnum role, String search, String username) {
         return jpaQueryFactory
-                .select(order.count())  // 👉 전체 개수 조회
+                .select(order.count())
                 .from(order)
                 .leftJoin(order.orderDetails, orderDetail)
                 .leftJoin(orderDetail.product, product)
                 //  .leftJoin(product.store, store)
                 .where(
                         isUserRole(role,userId),
-                        isOwnerRole(role,userId),
+                        isOwnerRole(role,username),
                         containsProductName(search)
 
                         //            ,containsStoreName(search)
@@ -83,8 +83,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     private BooleanExpression isUserRole(UserRoleEnum role, Long userId) {
         return (role != null && !role.equals(UserRoleEnum.USER)) ?  order.user.id.eq(userId) : null;
     }
-    private BooleanExpression isOwnerRole(UserRoleEnum role, Long userId) {
-        return (role != null && !role.equals(UserRoleEnum.OWNER)) ?  order.user.id.eq(userId) : null;
+    private BooleanExpression isOwnerRole(UserRoleEnum role, String username) {
+        return (role != null && !role.equals(UserRoleEnum.OWNER)) ?  store.createdBy.eq(username) : null;
     }
 
 }

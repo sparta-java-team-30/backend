@@ -8,5 +8,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface OrderRepositoryCustom{
 
-    Page<ResponseOrderHistoryDTO> findByUserIdAndProductOrStoreName(String search, Long userId, UserRoleEnum role, Pageable pageable, boolean isAsc);
+    Page<ResponseOrderHistoryDTO> findByUserIdAndProductOrStoreName(String search, Long userId, UserRoleEnum role, String username, Pageable pageable, boolean isAsc);
 }
