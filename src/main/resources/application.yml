@@ -1,9 +1,12 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: team30
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
+#    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    url: jdbc:h2:mem:testdb;
     username: sa
     password:
   h2:
@@ -25,3 +28,7 @@ springdoc:
 jwt:
   issuer: "team30"
   secretKey: "c3ByaW5nX2V4X3RlYW1fMzBfZmlyc3RfcHJvamVjdA=="
+
+gemini:
+  uri: ${GEMINI_URI}
+  key: ${GEMINI_SECRET_KEY}
