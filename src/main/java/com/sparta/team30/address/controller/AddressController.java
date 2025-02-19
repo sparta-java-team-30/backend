@@ -34,6 +34,15 @@ public class AddressController {
 
         return ResponseEntity.ok(addressDetails);
     }
+    //기본 배송지로 설정
+    @PatchMapping("/{address-id}/default")
+    public ResponseEntity<Map<String,String>> setDefaultAddress(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("address-id") UUID addressId) {
+
+        addressService.setDefaultAddress(userDetails, addressId);
+
+        return ResponseEntity.ok(Map.of("message", "기본 배송지로 설정되었습니다."));
+    }
+
 
     @PostMapping
     public ResponseEntity<Map<String,String>> addAddress(@AuthenticationPrincipal UserDetails userDetails,

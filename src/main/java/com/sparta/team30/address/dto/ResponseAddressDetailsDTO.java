@@ -17,6 +17,7 @@ public class ResponseAddressDetailsDTO {
     private String userAddress2;
     private Boolean isDeleted;
     private String nickname;
+    private Boolean isDefault;
     private LocalDateTime updatedAt;
 
 

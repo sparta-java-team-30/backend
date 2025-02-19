@@ -12,11 +12,11 @@ POST http://localhost:8080/api/addresses
 Content-Type: application/json
 
 
-{
-  "userPostcode": "01234",
-  "userAddress1": "서울특별시 광화문 123",
-  "userAddress2": "ㅁㅁ동 ㅁㅁ호"
-}
+    {
+      "userPostcode": "01234",
+      "userAddress1": "서울특별시 광화문 123",
+      "userAddress2": "ㅁㅁ동 ㅁㅁ호"
+    }
 
 
 ### PATCH ADDRESS

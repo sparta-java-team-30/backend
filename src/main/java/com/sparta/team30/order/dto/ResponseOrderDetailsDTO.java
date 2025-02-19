@@ -1,5 +1,6 @@
 package com.sparta.team30.order.dto;
 
+import com.sparta.team30.address.domain.Address;
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.domain.OrderTypeEnum;
 import lombok.AllArgsConstructor;
@@ -20,10 +21,12 @@ public class ResponseOrderDetailsDTO {
     private String orderStatus;
     private int price;
     //private String storeName;
-   // private String address;
+    private String userPostcode;
+    private String userAddress1;
+    private String userAddress2;
     private List<ResponseOrderProductDTO> productList;
 
-    public ResponseOrderDetailsDTO(Order order, List<ResponseOrderProductDTO> productList) {
+    public ResponseOrderDetailsDTO(Order order, Address address, List<ResponseOrderProductDTO> productList) {
         this.orderId = order.getOrderId();
         this.orderType = order.getOrderType();
         this.updatedAt = order.getUpdatedAt();
@@ -31,7 +34,9 @@ public class ResponseOrderDetailsDTO {
         this.orderStatus = order.getOrderStatus();
         this.price = order.getPrice();
         //this.storeName =
-        // this. address =
+        this. userPostcode = address.getUserPostcode();
+        this.userAddress1 = address.getUserAddress1();
+        this.userAddress2 = address.getUserAddress2();
         this.productList = new ArrayList<>(productList);
     }
 }

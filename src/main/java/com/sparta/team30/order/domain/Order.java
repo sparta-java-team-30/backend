@@ -41,8 +41,7 @@ public class Order extends BaseEntity {
     private int price;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id"
-            //,nullable = false
+    @JoinColumn(name = "user_id", nullable = false
     )
     private User user;
 
@@ -53,13 +52,11 @@ public class Order extends BaseEntity {
     private List<Payment> payment;
 
    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id"
-   //,nullable = false
+    @JoinColumn(name = "address_id", nullable = false
     )
     private Address address;
 
-    public Order(RequestCreateOrderDTO requestCreateOrderDTO, OrderTypeEnum orderType,int price, User user
-                 //,Address address
+    public Order(RequestCreateOrderDTO requestCreateOrderDTO, OrderTypeEnum orderType,int price, User user,Address address
                  ) {
         this.orderType = orderType;
         this.comment = requestCreateOrderDTO.getComment();
@@ -67,15 +64,12 @@ public class Order extends BaseEntity {
         this.isDeleted = false;
         this.price = price;
         this.user = user;
-        //this.address = address;
+        this.address = address;
     }
 
-    public void update(RequestUpdateOrderDTO orderDTO
-                       //,Address address
-    )
+    public void update(RequestUpdateOrderDTO orderDTO)
     {
         this.comment = orderDTO.getComment();
-        //this.address = address
     }
 
     public void setDeleted(Boolean deleted) {
@@ -84,5 +78,11 @@ public class Order extends BaseEntity {
 
     public void updateStatus(String orderStatus) {
         this.orderStatus=orderStatus;
+    }
+
+    public void deleteOrder(String deletedBy, String orderStatus) {
+        super.delete(deletedBy);
+        this.orderStatus=orderStatus;
+        this.isDeleted = true;
     }
 }

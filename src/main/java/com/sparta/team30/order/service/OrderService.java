@@ -1,5 +1,8 @@
 package com.sparta.team30.order.service;
 
+import com.sparta.team30.address.domain.Address;
+import com.sparta.team30.address.repository.AddressRepository;
+import com.sparta.team30.common.exception.AddressNotFoundException;
 import com.sparta.team30.common.exception.OrderAccessDeniedException;
 import com.sparta.team30.common.exception.OrderAlreadyProcessedException;
 import com.sparta.team30.common.exception.OrderNotFoundException;
@@ -7,6 +10,9 @@ import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.domain.OrderTypeEnum;
 import com.sparta.team30.order.dto.*;
 import com.sparta.team30.order.repository.OrderRepository;
+import com.sparta.team30.payment.domain.Payment;
+import com.sparta.team30.payment.domain.PaymentTypeEnum;
+import com.sparta.team30.payment.repository.PaymentRepository;
 import com.sparta.team30.products.domain.Product;
 import com.sparta.team30.products.repository.ProductRepository;
 import com.sparta.team30.user.domain.User;
@@ -22,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,7 +40,8 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final OrderDetailService orderDetailService;
     private final UserRepository userRepository;
-  //  private final AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
+    private final PaymentRepository paymentRepository;
     @Transactional
     public ResponseCreateOrderDTO addOrder(String username,
                                 RequestCreateOrderDTO requestCreateOrderDTO) {
@@ -47,7 +55,10 @@ public class OrderService {
         }
 
         //고객 주소
-        //Address address = addressRepository.findByUser(user);
+        Address address = addressRepository.findByUsernameAndAddressIsDefault(user.getUsername());
+        if(address==null){
+            throw new AddressNotFoundException("기본 배송지를 선택해 주세요.");
+        }
 
         //전역예외처리 ( 상품 예외)
         if (requestCreateOrderDTO.getProductList().isEmpty()) {
@@ -65,10 +76,7 @@ public class OrderService {
         for (RequestOrderProductDTO product : productDTOList) {
             totalPrice+=product.getPrice()*product.getQuantity();
         }
-        Order order = new Order(requestCreateOrderDTO,orderType, totalPrice,
-                user
-                //address
-                );
+        Order order = new Order(requestCreateOrderDTO,orderType, totalPrice, user ,address);
         orderRepository.save(order);
 
         List<UUID> productIdList = productDTOList.stream().map(RequestOrderProductDTO::getProductId).collect(Collectors.toList());
@@ -108,34 +116,30 @@ public class OrderService {
         }
         List<ResponseOrderProductDTO> orderProductList = orderDetailService.getOrderProductList(orderId);
 
-        return new ResponseOrderDetailsDTO(order,orderProductList);
+        return new ResponseOrderDetailsDTO(order,order.getAddress(), orderProductList);
     }
 
     @Transactional
     public void updateOrder(UserDetails userDetails, UUID orderId, RequestUpdateOrderDTO orderDTO) {
+
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("존재하지 않는 주문입니다."));
 
-        //사용자일 경우에만 체크
-        if(order.getUser().getRole().equals(UserRoleEnum.USER)) {
+        checkAutority(userDetails,order);
 
-            if (!order.getUser().getUsername().equals(userDetails.getUsername())) {
-                throw new OrderAccessDeniedException("권한이 없습니다.");
-            }
-
-            if (order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)))  //사용자는 5분 이내
-            {
-                throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(5분 초과)");
-            }
-        }
-        //주소 변경 추가 예정
-        //Address address = AddressRepository.findById(orderDTO.getAddressId);
         order.update(orderDTO);
-
     }
 
     @Transactional
     public void deleteOrder(UserDetails userDetails, UUID orderId) {
+
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("존재하지 않는 주문입니다."));
+
+        checkAutority(userDetails, order);
+
+        order.deleteOrder(order.getUser().getUsername(),"주문 취소");
+    }
+
+    private void checkAutority(UserDetails userDetails, Order order) {
 
         //사용자일 경우에만 체크
         if(order.getUser().getRole().equals(UserRoleEnum.USER)) {
@@ -149,12 +153,14 @@ public class OrderService {
                 throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(5분 초과)");
             }
         }
-
-        order.delete(order.getUser().getUsername());
-        order.setDeleted(true); //is_deleted 필드 변경
-        order.updateStatus("주문 취소");
+        //MASTER 제외 결제된 주문은 수정 불가
+        if (!order.getUser().getRole().equals(UserRoleEnum.MASTER)) {
+            Optional<Payment> findPayment = paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order);
+            if (findPayment.isPresent() && findPayment.get().getPaymentStatus().equals(PaymentTypeEnum.COMPLETED)) {
+                throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(결제 완료)");
+            }
+        }
     }
-
 
 
 }
