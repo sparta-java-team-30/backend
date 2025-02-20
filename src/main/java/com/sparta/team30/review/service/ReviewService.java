@@ -1,7 +1,6 @@
 package com.sparta.team30.review.service;
 
 import com.sparta.team30.common.exception.*;
-import com.sparta.team30.infrastructure.security.UserDetailsImpl;
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.review.domain.Review;
@@ -17,11 +16,9 @@ import com.sparta.team30.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
