@@ -19,9 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,10 +54,11 @@ public class ReviewController {
     })
     public ResponseEntity<Page<ReviewResponseDto>> getAllReviewsByStore(
             @PathVariable UUID storeId,
-            @Parameter(description = "페이지 번호 (1부터 시작)", example = "1") @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "페이지 크기", example = "10") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 기준 필드", example = "createdAt") @RequestParam(defaultValue = "createdAt") String sortBy,
-            @Parameter(description = "오름차순/내림차순", example = "true") @RequestParam(defaultValue = "true") boolean isAsc) {
+            @Parameter(description = "오름차순/내림차순", example = "true") @RequestParam(defaultValue = "true") boolean isAsc,
+            @Parameter(description = "리뷰 내용 키워드", example = "맛있") @RequestParam(required = false) String keyword) {
 
         // 페이징 및 정렬 조건 설정
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
@@ -67,7 +66,7 @@ public class ReviewController {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         // 서비스 호출
-        Page<Review> reviews = reviewService.findAllReviewByStore(storeId, pageable);
+        Page<Review> reviews = reviewService.findAllReviewByStore(storeId, keyword, pageable);
 
         // Review 엔티티를 ReviewResponseDto로 변환
         Page<ReviewResponseDto> response = reviews.map(ReviewResponseDto::new);

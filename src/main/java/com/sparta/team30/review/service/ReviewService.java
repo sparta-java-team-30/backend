@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -34,12 +33,12 @@ public class ReviewService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public Page<Review> findAllReviewByStore(UUID storeId, Pageable pageable) {
+    public Page<Review> findAllReviewByStore(UUID storeId,String keyword,Pageable pageable) {
         // 음식점 검사
         Store store = mockStoreRepository.findById(storeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 음식점이 존재하지 않습니다"));
 
-        return reviewRepository.findAllByStoreIdAndIsDeletedFalse(storeId, pageable);
+        return reviewRepository.findAllByStoreIdAndIsDeletedFalseWithKeyword(storeId,keyword, pageable);
     }
 
     //등록
