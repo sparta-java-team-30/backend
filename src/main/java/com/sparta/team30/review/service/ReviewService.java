@@ -116,8 +116,6 @@ public class ReviewService {
         } else {
             throw new ReviewAccessDeniedException("해당 작업은 USER 또는 MANAGER 역할만 수행할 수 있습니다.");
         }
-
-        int oldScore = review.getScore();
         review.updateReview(requestDto.getScore(), requestDto.getContent());
 
         UUID storeId = review.getStoreId().getStoreId();
