@@ -157,4 +157,14 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> PaymentNotFoundException(PaymentNotFoundException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_FOUND
+        );
+    }
 }

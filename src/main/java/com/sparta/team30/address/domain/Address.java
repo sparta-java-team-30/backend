@@ -33,6 +33,9 @@ public class Address extends BaseEntity {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
+    @Column(name = "is_default")
+    private Boolean isDefault = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -42,6 +45,7 @@ public class Address extends BaseEntity {
         this.userPostcode = requestCreateAddressDTO.getUserPostcode();
         this.userAddress1 = requestCreateAddressDTO.getUserAddress1();
         this.userAddress2 = requestCreateAddressDTO.getUserAddress2();
+        this.isDefault=true;
     }
 
     public void update(RequestUpdateAddressDTO requestUpdateAddressDTO) {
@@ -50,7 +54,13 @@ public class Address extends BaseEntity {
         this.userAddress2 = requestUpdateAddressDTO.getUserAddress2();
     }
 
-    public void setDeleted(Boolean deleted) {
-        isDeleted = deleted;
+    public void deleteAddress(String deletedBy) {
+        this.isDeleted = true;
+        this.isDefault=false;
+        super.delete(deletedBy);
+    }
+
+    public void updateDefault(boolean isDefault) {
+        this.isDefault=isDefault;
     }
 }

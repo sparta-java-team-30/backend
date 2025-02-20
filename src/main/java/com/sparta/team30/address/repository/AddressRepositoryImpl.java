@@ -29,10 +29,11 @@ public class AddressRepositoryImpl implements AddressRepositoryCustom {
                         address.userAddress1,
                         address.userAddress2,
                         address.isDeleted,
-                        user.nickname
+                        user.nickname,
+                        address.isDefault
                 )).from(address)
                 .leftJoin(address.user, user)
-                .orderBy(address.updatedAt.desc())
+                .orderBy(address.createdAt.desc())
                 .where(user.username.eq(username)).fetch();
 
         return fetch;
@@ -51,6 +52,7 @@ public class AddressRepositoryImpl implements AddressRepositoryCustom {
                         address.userAddress2,
                         address.isDeleted,
                         user.nickname,
+                        address.isDefault,
                         address.updatedAt
                 )).from(address)
                 .leftJoin(address.user, user)
@@ -58,5 +60,26 @@ public class AddressRepositoryImpl implements AddressRepositoryCustom {
                 .fetchOne();
 
         return addressDetailsDTO;
+    }
+
+    @Override
+    public long clearAllAdressFalse(String username) {
+        QAddress address = QAddress.address;
+        long execute = jpaQueryFactory.update(address)
+                .set(QAddress.address.isDefault, false)
+                .where(address.createdBy.eq(username))
+                .execute();
+        return execute;
+    }
+
+    @Override
+    public Address findByUsernameAndAddressIsDefault(String username) {
+        QAddress address = QAddress.address;
+        Address defaultAddress = jpaQueryFactory.select(address).from(address)
+                .where(address.isDefault.eq(true),
+                        address.createdBy.eq(username)
+                ).fetchOne();
+
+        return defaultAddress;
     }
 }

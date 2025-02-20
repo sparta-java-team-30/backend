@@ -60,4 +60,10 @@ public class Payment extends BaseEntity {
         }
 
     }
+
+    public void deletePayment(String deletedBy, PaymentTypeEnum paymentTypeEnum) {
+        super.delete(deletedBy);
+        this.paymentStatus = paymentTypeEnum;
+        this.isDeleted = true;
+    }
 }
