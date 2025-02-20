@@ -30,5 +30,5 @@ jwt:
   secretKey: "c3ByaW5nX2V4X3RlYW1fMzBfZmlyc3RfcHJvamVjdA=="
 
 gemini:
-  uri: ${GEMINI_URI}
-  key: ${GEMINI_SECRET_KEY}
+  uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContentAIzaSyBAPbpND-AfNy3swheWJ70AoVaMRPeY0Vc
+  key: AIzaSyBAPbpND-AfNy3swheWJ70AoVaMRPeY0Vc
