@@ -8,8 +8,8 @@ import com.sparta.team30.review.dto.ReviewCreateRequestDto;
 import com.sparta.team30.review.dto.ReviewResponseDto;
 import com.sparta.team30.review.dto.ReviewUpdateRequestDto;
 import com.sparta.team30.review.repository.ReviewRepository;
-import com.sparta.team30.review.repository.MockStoreRepository;
 import com.sparta.team30.store.domain.Store;
+import com.sparta.team30.store.repository.StoreRepository;
 import com.sparta.team30.user.domain.User;
 import com.sparta.team30.user.domain.UserRoleEnum;
 import com.sparta.team30.user.repository.UserRepository;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +30,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final OrderRepository orderRepository;
-    private final MockStoreRepository mockStoreRepository;
+    private final StoreRepository storeRepository;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
@@ -173,7 +172,7 @@ public class ReviewService {
     }
 
     private Store findStoreById(UUID storeId) {
-        return mockStoreRepository.findByStoreIdAndIsDeletedFalse(storeId)
+        return storeRepository.findByStoreIdAndIsDeletedFalse(storeId)
                 .orElseThrow(() -> new StoreNotFoundException("해당 매장이 존재하지 않습니다."));
     }
 
@@ -222,7 +221,7 @@ public class ReviewService {
             store.setStoreReviewCount(currentReviewCount - 1);
         }
 
-        mockStoreRepository.save(store);
+        storeRepository.save(store);
     }
 
 
