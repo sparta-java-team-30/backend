@@ -20,20 +20,20 @@ public class ResponseOrderDetailsDTO {
     private String comment;
     private String orderStatus;
     private int price;
-    //private String storeName;
+    private String storeName;
     private String userPostcode;
     private String userAddress1;
     private String userAddress2;
     private List<ResponseOrderProductDTO> productList;
 
-    public ResponseOrderDetailsDTO(Order order, Address address, List<ResponseOrderProductDTO> productList) {
+    public ResponseOrderDetailsDTO(Order order, Address address, String storeName, List<ResponseOrderProductDTO> productList) {
         this.orderId = order.getOrderId();
         this.orderType = order.getOrderType();
         this.updatedAt = order.getUpdatedAt();
         this.comment = order.getComment();
         this.orderStatus = order.getOrderStatus();
         this.price = order.getPrice();
-        //this.storeName =
+        this.storeName = storeName;
         this. userPostcode = address.getUserPostcode();
         this.userAddress1 = address.getUserAddress1();
         this.userAddress2 = address.getUserAddress2();

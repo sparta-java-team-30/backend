@@ -30,4 +30,8 @@ public class OrderDetailService {
 
         return orderDetailRepository.findByOrderId(orderId);
     }
+
+    public String getStoreName(UUID orderId) {
+        return orderDetailRepository.findStoreNameByOrderId(orderId);
+    }
 }

@@ -37,21 +37,20 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         order.price,
                         payment.paymentType,
                         payment.paymentStatus,
-                        payment.updatedAt.as("paymentAt")
-                        //  product.store.storeName
+                        payment.updatedAt.as("paymentAt"),
+                        product.store.storeName
                 ))
                 .from(order)
                 .leftJoin(order.orderDetails, orderDetail)
                 .leftJoin(orderDetail.product, product)
                 .leftJoin(order.payment,payment)
-                //  .leftJoin(product.store,store)
+                .leftJoin(product.store,store)
                 .where(
                         isUserRole(role, userId),
                         isOwnerRole(role, username),
                         order.isDeleted.eq(false),
-                        containsProductName(search)
-
-                        //    ,containsStoreName(search)
+                        containsProductName(search),
+                        containsStoreName(search)
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -70,13 +69,12 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .leftJoin(order.orderDetails, orderDetail)
                 .leftJoin(orderDetail.product, product)
                 .leftJoin(order.payment,payment)
-                //  .leftJoin(product.store, store)
+                .leftJoin(product.store, store)
                 .where(
                         isUserRole(role,userId),
                         isOwnerRole(role,username),
-                        containsProductName(search)
-
-                        //            ,containsStoreName(search)
+                        containsProductName(search),
+                        containsStoreName(search)
                 );
     }
     private BooleanExpression containsStoreName(String storeName) {
