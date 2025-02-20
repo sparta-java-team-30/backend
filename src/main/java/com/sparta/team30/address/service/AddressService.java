@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -42,12 +43,25 @@ public class AddressService {
 
         return addressDetailsDTO;
     }
-
+    @Transactional
     public void addAddress(UserDetails userDetails, RequestCreateAddressDTO requestCreateAddressDTO) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
+        clearLatestAddressDefault(userDetails.getUsername());
         addressRepository.save(new Address(user, requestCreateAddressDTO));
     }
+
+    //기본 배송지로 설정
+    @Transactional
+    public void setDefaultAddress(UserDetails userDetails, UUID addressId) {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
+        Address address = addressRepository.findById(addressId).orElseThrow(() -> new AddressNotFoundException("존재하지 않는 주소입니다."));
+
+        clearLatestAddressDefault(userDetails.getUsername());
+
+        address.updateDefault(true);
+    }
+
 
     @Transactional
     public void updateAddress(UserDetails userDetails, UUID addressId, RequestUpdateAddressDTO requestUpdateAddressDTO) {
@@ -70,7 +84,13 @@ public class AddressService {
             throw new AddressAccessDeniedException("잘못된 접근입니다.");
         }
 
-        address.delete(userDetails.getUsername());
-        address.setDeleted(true);
+        address.deleteAddress(userDetails.getUsername());
     }
+
+
+    private void clearLatestAddressDefault(String username) {
+        long l = addressRepository.clearAllAdressFalse(username);
+    }
+
+
 }

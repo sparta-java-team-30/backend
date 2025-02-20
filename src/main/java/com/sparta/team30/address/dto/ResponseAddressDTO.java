@@ -15,5 +15,6 @@ public class ResponseAddressDTO {
     private String userAddress2;
     private Boolean isDeleted;
     private String nickname;
+    private Boolean isDefault;
 
 }

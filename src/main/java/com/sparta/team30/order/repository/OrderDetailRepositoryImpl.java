@@ -8,6 +8,7 @@ import com.sparta.team30.order.domain.QOrder;
 import com.sparta.team30.order.domain.QOrderDetail;
 import com.sparta.team30.order.dto.ResponseOrderProductDTO;
 import com.sparta.team30.products.domain.QProduct;
+import com.sparta.team30.store.domain.QStore;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -39,4 +40,20 @@ public class OrderDetailRepositoryImpl implements OrderDetailRepositoryCustom {
 
         return productDTOList;
     }
+
+    @Override
+    public String findStoreNameByOrderId(UUID orderId) {
+        QOrderDetail orderDetail = QOrderDetail.orderDetail;
+        QStore store = QStore.store;
+        QProduct product = QProduct.product;
+        String s = queryFactory.select(
+                        store.storeName
+                ).from(orderDetail)
+                .leftJoin(orderDetail.product, product)
+                .leftJoin(product.store, store)
+                .where(orderDetail.order.orderId.eq(orderId))
+                .fetchOne();
+        return s;
+    }
+
 }

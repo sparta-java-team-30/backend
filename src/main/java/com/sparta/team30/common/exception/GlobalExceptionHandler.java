@@ -157,4 +157,36 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> PaymentNotFoundException(PaymentNotFoundException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(StoreNotFoundException.class)
+    public ResponseEntity<ErrorResponse> storeNotFoundException(StoreNotFoundException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(DuplicateStoreException.class)
+    public ResponseEntity<ErrorResponse> duplicateStoreException(DuplicateStoreException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.CONFLICT
+        );
+    }
 }

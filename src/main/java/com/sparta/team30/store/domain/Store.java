@@ -2,6 +2,7 @@ package com.sparta.team30.store.domain;
 
 import com.sparta.team30.category.domain.Category;
 import com.sparta.team30.common.domain.BaseEntity;
+import com.sparta.team30.store.dto.StoreRequestDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,6 +72,33 @@ public class Store extends BaseEntity {
             this.storeGrade = roundedAverage;
             this.storeReviewCount++;
         }
+    }
+
+    public void UpdateAvgRating(Double storeGrade) {
+        this.storeGrade = storeGrade;
+    }
+
+    public void UpdateReviewCount(int storeReviewCount) {
+        this.storeReviewCount = storeReviewCount;
+    }
+
+    public Store(Category category, StoreRequestDto requestDto) {
+        this.category = category;
+        this.storeName = requestDto.getStoreName();
+        this.storePhone = requestDto.getStorePhone();
+        this.storePostcode = requestDto.getStorePostcode();
+        this.storeAddress1 = requestDto.getStoreAddress1();
+        this.storeAddress2 = requestDto.getStoreAddress2();
+    }
+
+    public void approve() {
+        this.isApproved = true;
+    }
+
+    @Override
+    public void delete(String deletedBy) {
+        super.delete(deletedBy);
+        this.isDeleted = true;
     }
 
 }
