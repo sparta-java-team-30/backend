@@ -1,6 +1,7 @@
 package com.sparta.team30.address.dto;
 
 import com.sparta.team30.address.domain.Address;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,7 +13,9 @@ import java.util.UUID;
 public class ResponseAddressDetailsDTO {
 
     private UUID addressId;
+    @Schema(description = "우편번호", example = "12345")
     private String userPostcode;
+
     private String userAddress1;
     private String userAddress2;
     private Boolean isDeleted;

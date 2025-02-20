@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface OrderDetailRepositoryCustom {
 
     List<ResponseOrderProductDTO> findByOrderId(UUID orderId);
+
+    String findStoreNameByOrderId(UUID orderId);
 }

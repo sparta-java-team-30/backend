@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-//@AllArgsConstructor
+@AllArgsConstructor
 public class ResponseOrderHistoryDTO {
     private UUID orderId;
     private Long userId;
@@ -20,7 +20,7 @@ public class ResponseOrderHistoryDTO {
     private String paymentType;
     private PaymentTypeEnum paymentStatus;
     private LocalDateTime paymentAt;
-    //private String storeName;
+    private String storeName;
 
     //임시 (음식점 추가 시 삭제 예정)
     public ResponseOrderHistoryDTO(UUID orderId, Long userId, OrderTypeEnum orderType, LocalDateTime updatedAt,

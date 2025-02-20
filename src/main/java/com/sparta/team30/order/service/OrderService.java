@@ -116,7 +116,9 @@ public class OrderService {
         }
         List<ResponseOrderProductDTO> orderProductList = orderDetailService.getOrderProductList(orderId);
 
-        return new ResponseOrderDetailsDTO(order,order.getAddress(), orderProductList);
+        String storeName = orderDetailService.getStoreName(orderId);
+
+        return new ResponseOrderDetailsDTO(order,order.getAddress(), storeName, orderProductList);
     }
 
     @Transactional
