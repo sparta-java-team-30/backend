@@ -1,5 +1,7 @@
 package com.sparta.team30.review.service;
 
+import com.sparta.team30.common.exception.ReviewAccessDeniedException;
+import com.sparta.team30.common.exception.ReviewTimeExpiredException;
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.review.domain.Review;
@@ -8,13 +10,17 @@ import com.sparta.team30.review.repository.ReviewRepository;
 import com.sparta.team30.review.repository.MockStoreRepository;
 import com.sparta.team30.store.domain.Store;
 import com.sparta.team30.user.domain.User;
+import com.sparta.team30.user.domain.UserRoleEnum;
 import com.sparta.team30.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,22 +34,12 @@ public class ReviewService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public List<Review> findAllReviewByStore(UUID storeId/*, int page, int size, String sortBy, boolean isAsc*/) {
-        //음식점 검사
+    public Page<Review> findAllReviewByStore(UUID storeId, Pageable pageable) {
+        // 음식점 검사
         Store store = mockStoreRepository.findById(storeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 음식점이 존재하지 않습니다"));
-//
-//        //페이징네이션
-//        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
-//        Sort sort= Sort.by(direction, sortBy);
-//        //기본값 10 설정 조작 방지
-//        int allowedSize = (size == 10 || size == 30 || size == 50) ? size : 10;
-//        Pageable pageable= PageRequest.of(page,allowedSize,sort);
 
-        //조회시 본인것만 조회 or 모두 조회 권한 enumRole User / ALL
-
-        return reviewRepository.findAllByStoreAndIsDeletedFalse(storeId);
-
+        return reviewRepository.findAllByStoreIdAndIsDeletedFalse(storeId, pageable);
     }
 
     //등록
@@ -79,9 +75,34 @@ public class ReviewService {
         //리뷰 존재 여부
         Review review = reviewRepository.findByReviewIdAndIsDeletedFalse(reviewRequestDto.getReviewId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않거나 이미 삭제되었습니다."));
+        if (reviewRequestDto.getScore() < 0 || reviewRequestDto.getScore() > 5) { // 점수 범위 가정
+            throw new IllegalArgumentException("유효한 점수 범위를 입력해주세요.");
+        }
         //유저확인
-        if (!review.getUser().getUsername().equals(username)) {
-            throw new IllegalArgumentException("다른 사용자의 리뷰는 삭제할 수 없습니다.");
+        // 사용자 역할 및 권한 확인
+        User user = review.getUser();
+        String userAuthority = user.getRole().getAuthority(); // UserRoleEnum에서 권한 가져오기
+
+        if (userAuthority.equals(UserRoleEnum.Authority.CUSTOMER)) { // USER 역할
+            // 사용자 본인 확인
+            if (!user.getUsername().equals(username)) {
+                throw new ReviewAccessDeniedException("권한이 없습니다.");
+            }
+
+            // 생성 후 3일 이내인지 확인
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime createdAt = review.getCreatedAt();
+            if (createdAt.isBefore(now.minusDays(3))) {
+                throw new ReviewTimeExpiredException("리뷰는 생성 후 3일 이내에만 수정할 수 있습니다.");
+            }
+
+        } else if (userAuthority.equals(UserRoleEnum.Authority.MANAGER)) { // MANAGER 역할
+            // MANAGER는 시간 제한 없이 수정 가능, 하지만 현재 사용자와 동일해야 함 (필요 시)
+            if (!username.equals("admin")) { // MANAGER의 특정 사용자 이름 조건 (필요 시 수정)
+                throw new ReviewAccessDeniedException("관리자만 리뷰를 수정할 수 있습니다.");
+            }
+        } else {
+            throw new ReviewAccessDeniedException("해당 작업은 USER 또는 MANAGER 역할만 수행할 수 있습니다.");
         }
 
         UUID storeId = reviewRequestDto.getStoreId();
@@ -144,10 +165,6 @@ public class ReviewService {
         // 현재 리뷰 수와 평균 평점 가져오기
         int currentReviewCount = store.getStoreReviewCount();
         double currentAverage = store.getStoreGrade();
-
-        if (currentReviewCount <= 0) {
-            throw new IllegalStateException("리뷰가 존재하지 않습니다.");
-        }
 
         // 새로운 평균 계산
         // (기존 평균 * 기존 리뷰 수 - 기존 평점 + 새 평점) / (리뷰 수)

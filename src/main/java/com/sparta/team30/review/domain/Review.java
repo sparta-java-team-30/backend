@@ -12,6 +12,12 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
+@NamedEntityGraph(name = "Review.withUserAndStore",
+        attributeNodes = {
+                @NamedAttributeNode("user"),
+                @NamedAttributeNode("storeId"),
+                @NamedAttributeNode("orderId")
+        })
 @Getter
 @NoArgsConstructor
 @Table(name = "P_REVIEW")

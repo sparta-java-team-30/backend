@@ -73,12 +73,4 @@ public class Store extends BaseEntity {
         }
     }
 
-    public void UpdateAvgRating(Double storeGrade) {
-        this.storeGrade = storeGrade;
-    }
-
-    public void UpdateReviewCount(int storeReviewCount) {
-        this.storeReviewCount = storeReviewCount;
-    }
-
 }
