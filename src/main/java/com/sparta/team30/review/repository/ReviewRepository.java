@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +27,8 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
             @Param("keyword") String keyword,
             Pageable pageable);
 
+    @EntityGraph(attributePaths = {"storeId", "orderId"})
+    List<Review> findAllByUserIdAndIsDeletedFalse(Long id);
 
 
     Optional<Review> findByReviewIdAndIsDeletedFalse(UUID storeId);

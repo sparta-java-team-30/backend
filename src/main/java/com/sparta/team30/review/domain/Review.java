@@ -62,6 +62,13 @@ public class Review extends BaseEntity {
         super.delete(deletedBy);
         this.isDeleted = true;
     }
+    public void updateReview(int score, String content) {
+        if (score < 1 || score > 5) {
+            throw new IllegalArgumentException("평점은 1 ~ 5 만 가능합니다.");
+        }
+        this.score = score;
+        this.content = content;
+    }
 
 
 }

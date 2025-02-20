@@ -3,7 +3,6 @@ package com.sparta.team30.review.controller;
 import com.sparta.team30.infrastructure.security.UserDetailsImpl;
 import com.sparta.team30.review.domain.Review;
 import com.sparta.team30.review.dto.ReviewCreateRequestDto;
-import com.sparta.team30.review.dto.ReviewRequestDto;
 import com.sparta.team30.review.dto.ReviewResponseDto;
 import com.sparta.team30.review.dto.ReviewUpdateRequestDto;
 import com.sparta.team30.review.service.ReviewService;
@@ -11,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,8 +21,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
-
+@Tag(name = "Review API", description = "리뷰 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/review")
@@ -75,6 +76,20 @@ public class ReviewController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/my-reviews")
+    @Operation(summary = "내 리뷰 목록 조회", description = "현재 로그인한 사용자의 리뷰 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 목록이 성공적으로 조회됨"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "404", description = "리뷰 데이터를 찾을 수 없음")
+    })
+    public ResponseEntity<List<ReviewResponseDto>> getAllReviews(@Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails){
+        String username = userDetails.getUsername();
+        List<ReviewResponseDto> reviews = reviewService.findAllReviewByUser(username);
+        return ResponseEntity.ok(reviews);
+    }
+
 
     //    //수정
     @PatchMapping("/{reviewId}")
