@@ -2,8 +2,10 @@ package com.sparta.team30.review.controller;
 
 import com.sparta.team30.infrastructure.security.UserDetailsImpl;
 import com.sparta.team30.review.domain.Review;
+import com.sparta.team30.review.dto.ReviewCreateRequestDto;
 import com.sparta.team30.review.dto.ReviewRequestDto;
 import com.sparta.team30.review.dto.ReviewResponseDto;
+import com.sparta.team30.review.dto.ReviewUpdateRequestDto;
 import com.sparta.team30.review.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,11 +39,11 @@ public class ReviewController {
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "409", description = "이미 해당 주문에 리뷰가 존재함")
     })
-    public ResponseEntity<Review> CreateReview(
-            @Parameter(description = "리뷰 생성 요청 DTO", required = true) @RequestBody ReviewRequestDto requestDto,
+    public ResponseEntity<ReviewResponseDto> CreateReview(
+            @Parameter(description = "리뷰 생성 요청 DTO", required = true) @RequestBody ReviewCreateRequestDto requestDto,
             @Parameter(hidden = true, description = "현재 인증된 사용자") @AuthenticationPrincipal UserDetailsImpl userDetails) {
         String username = userDetails.getUsername();
-        Review response = reviewService.addReview(requestDto, username);
+        ReviewResponseDto response = reviewService.addReview(requestDto, username);
         return ResponseEntity.ok(response);
     }
 
@@ -82,7 +84,7 @@ public class ReviewController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "404", description = "리뷰를 찾을 수 없음")
     })
-    public ResponseEntity<String> updateReview(@Parameter(description = "리뷰 수정 요청 DTO") @RequestBody ReviewRequestDto requestDto,
+    public ResponseEntity<String> updateReview(@Parameter(description = "리뷰 수정 요청 DTO") @RequestBody ReviewUpdateRequestDto requestDto,
                                                @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
         reviewService.updateReview(requestDto, username);

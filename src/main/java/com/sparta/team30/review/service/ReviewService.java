@@ -5,7 +5,10 @@ import com.sparta.team30.common.exception.ReviewTimeExpiredException;
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.review.domain.Review;
+import com.sparta.team30.review.dto.ReviewCreateRequestDto;
 import com.sparta.team30.review.dto.ReviewRequestDto;
+import com.sparta.team30.review.dto.ReviewResponseDto;
+import com.sparta.team30.review.dto.ReviewUpdateRequestDto;
 import com.sparta.team30.review.repository.ReviewRepository;
 import com.sparta.team30.review.repository.MockStoreRepository;
 import com.sparta.team30.store.domain.Store;
@@ -43,19 +46,19 @@ public class ReviewService {
 
     //등록
     @Transactional
-    public Review addReview(ReviewRequestDto reviewRequestDto , String username) {
+    public ReviewResponseDto addReview(ReviewCreateRequestDto requestDto, String username) {
         User user = findUserByUserId(username);
-        Order order = findOrderById(reviewRequestDto.getOrderId());
-        Store store = findStoreById(reviewRequestDto.getStoreId());
+        Order order = findOrderById(requestDto.getOrderId());
+        Store store = findStoreById(requestDto.getStoreId());
         validateReviewUniqueness(order);
 
-        if (reviewRequestDto.getContent().length() > 255){
+        if (requestDto.getContent().length() > 255) {
             throw new IllegalArgumentException("리뷰내용은 최대 255자까지 가능합니다.");
         }
 
         Review review = new Review(
-                reviewRequestDto.getScore(),
-                reviewRequestDto.getContent(),
+                requestDto.getScore(),
+                requestDto.getContent(),
                 store,
                 order,
                 user
@@ -63,18 +66,20 @@ public class ReviewService {
 
         // 음식점 리뷰 최초 등록 시 누적평균 평점 초기화
         // 이후 리뷰가 추가될 경우 누적평균을 업데이트 함.
-        store.addReviewScore(reviewRequestDto.getScore());
+        store.addReviewScore(requestDto.getScore());
 
-        return reviewRepository.save(review);
+        Review savedReview = reviewRepository.save(review);
+
+        return new ReviewResponseDto(savedReview);
     }
 
     //수정 reviewId socre content 받아서 해당 글 수정 put
     @Transactional
-    public void updateReview(ReviewRequestDto reviewRequestDto,String username) {
+    public void updateReview(ReviewUpdateRequestDto RequestDto, String username) {
         //리뷰 존재 여부
-        Review review = reviewRepository.findByReviewIdAndIsDeletedFalse(reviewRequestDto.getReviewId())
+        Review review = reviewRepository.findByReviewIdAndIsDeletedFalse(RequestDto.getReviewId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않거나 이미 삭제되었습니다."));
-        if (reviewRequestDto.getScore() < 0 || reviewRequestDto.getScore() > 5) { // 점수 범위 가정
+        if (RequestDto.getScore() < 0 || RequestDto.getScore() > 5) { // 점수 범위 가정
             throw new IllegalArgumentException("유효한 점수 범위를 입력해주세요.");
         }
         //유저확인
@@ -96,17 +101,17 @@ public class ReviewService {
             }
 
         } else if (userAuthority.equals(UserRoleEnum.Authority.MANAGER)) { // MANAGER 역할
-            // MANAGER는 시간 제한 없이 수정 가능, 하지만 현재 사용자와 동일해야 함 (필요 시)
-            if (!username.equals("admin")) { // MANAGER의 특정 사용자 이름 조건 (필요 시 수정)
+            // MANAGER는 시간 제한 없이 수정 가능, 하지만 현재 사용자와 동일해야 함
+            if (!username.equals("admin")) { // MANAGER의 특정 사용자 이름 조건
                 throw new ReviewAccessDeniedException("관리자만 리뷰를 수정할 수 있습니다.");
             }
         } else {
             throw new ReviewAccessDeniedException("해당 작업은 USER 또는 MANAGER 역할만 수행할 수 있습니다.");
         }
 
-        UUID storeId = reviewRequestDto.getStoreId();
+        UUID storeId = review.getStoreId().getStoreId();
         int score = review.getScore();
-        updateStoreRating(storeId, score, reviewRequestDto.getScore());
+        updateStoreRating(storeId, score, RequestDto.getScore());
     }
 
 
