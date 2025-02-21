@@ -1,4 +1,4 @@
-package com.sparta.team30.infrastructure.config;
+package com.sparta.team30.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

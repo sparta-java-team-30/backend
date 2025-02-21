@@ -27,8 +27,13 @@ springdoc:
     - /api/**
 jwt:
   issuer: "team30"
-  secretKey: "c3ByaW5nX2V4X3RlYW1fMzBfZmlyc3RfcHJvamVjdA=="
+  secretKey: ${JWT_SECRET_KEY}
 
 gemini:
   uri: ${GEMINI_URI}
   key: ${GEMINI_SECRET_KEY}
+
+secret:
+  code:
+    manager: ${MANAGER_SECRET_CODE}
+    master: ${MASTER_SECRET_CODE}
