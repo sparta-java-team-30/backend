@@ -3,7 +3,7 @@ package com.sparta.team30.carts.controller;
 import com.sparta.team30.carts.dto.CartItemRequestDto;
 import com.sparta.team30.carts.dto.CartItemResponseDto;
 import com.sparta.team30.carts.service.CartService;
-import com.sparta.team30.infrastructure.security.UserDetailsImpl;
+import com.sparta.team30.common.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
