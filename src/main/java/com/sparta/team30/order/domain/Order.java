@@ -72,10 +72,6 @@ public class Order extends BaseEntity {
         this.comment = orderDTO.getComment();
     }
 
-    public void setDeleted(Boolean deleted) {
-        isDeleted = deleted;
-    }
-
     public void updateStatus(String orderStatus) {
         this.orderStatus=orderStatus;
     }

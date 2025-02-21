@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +48,7 @@ public class OrderController {
                     schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     public ResponseEntity<Map> addOrder(@AuthenticationPrincipal UserDetails userDetails,
-                                            @RequestBody RequestCreateOrderDTO requestCreateOrderDTO) {
+                                            @RequestBody @Valid RequestCreateOrderDTO requestCreateOrderDTO) {
         String username = userDetails.getUsername();
 
             orderService.addOrder(username,
@@ -100,7 +101,7 @@ public class OrderController {
     public ResponseEntity<Map<String, String>> updateOrder(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("order-id") UUID orderId,
-            @RequestBody RequestUpdateOrderDTO orderDTO) {
+            @RequestBody @Valid RequestUpdateOrderDTO orderDTO) {
         orderService.updateOrder(userDetails,orderId,orderDTO);
 
         return ResponseEntity.status(200).body(Map.of("message", "주문이 수정되었습니다."));

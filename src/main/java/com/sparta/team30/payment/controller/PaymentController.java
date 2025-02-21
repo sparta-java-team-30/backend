@@ -13,6 +13,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,7 +43,7 @@ public class PaymentController {
     @PostMapping
     public ResponseEntity<ResponseCreatePaymentDTO> makePayment(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody RequestPaymentByOrderId requestPaymentByOrderId) {
+            @RequestBody @Valid RequestPaymentByOrderId requestPaymentByOrderId) {
         ResponseCreatePaymentDTO responseCreatePaymentDTO = paymentService.makePayment(userDetails, requestPaymentByOrderId);
         return ResponseEntity.ok(responseCreatePaymentDTO);
     }
