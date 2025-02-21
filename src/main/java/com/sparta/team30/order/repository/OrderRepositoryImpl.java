@@ -28,7 +28,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     QStore store = QStore.store;
     QPayment payment = QPayment.payment;
     public Page<ResponseOrderHistoryDTO> findByUserIdAndProductOrStoreName(String search, Long userId, UserRoleEnum role, String username, Pageable pageable , boolean isAsc) {
-        List<ResponseOrderHistoryDTO> response = jpaQueryFactory.select(Projections.constructor(ResponseOrderHistoryDTO.class,
+        List<ResponseOrderHistoryDTO> response = jpaQueryFactory.selectDistinct(Projections.constructor(ResponseOrderHistoryDTO.class,
                         order.orderId,
                         order.user.id,
                         order.orderType,
@@ -64,7 +64,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
     JPAQuery<Long> getTotalCount(Long userId, UserRoleEnum role, String search, String username) {
         return jpaQueryFactory
-                .select(order.count())
+                .selectDistinct(order.count())
                 .from(order)
                 .leftJoin(order.orderDetails, orderDetail)
                 .leftJoin(orderDetail.product, product)
@@ -73,6 +73,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                 .where(
                         isUserRole(role,userId),
                         isOwnerRole(role,username),
+                        order.isDeleted.eq(false),
                         containsProductName(search),
                         containsStoreName(search)
                 );
