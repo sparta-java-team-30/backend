@@ -66,15 +66,17 @@ public class OrderService {
         }
         List<RequestOrderProductDTO> productDTOList = requestCreateOrderDTO.getProductList();
 
-        //전역예외처리 (상품 예외 )
+        //전역예외처리 (상품 예외)
         productDTOList.stream().forEach(productDTO -> {
             if(productDTO.getProductId()==null){
                 throw new IllegalArgumentException("잘못된 요청입니다.");
             }
         });
         int totalPrice = 0;
-        for (RequestOrderProductDTO product : productDTOList) {
-            totalPrice+=product.getPrice()*product.getQuantity();
+        for (RequestOrderProductDTO productDTO : productDTOList) {
+            Product product = productRepository.findById(productDTO.getProductId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+            if(productDTO.getQuantity()<=0) throw  new IllegalArgumentException("상품을 1개 이상 선택해주세요.");
+            totalPrice += product.getPrice() * productDTO.getQuantity();
         }
         Order order = new Order(requestCreateOrderDTO,orderType, totalPrice, user ,address);
         orderRepository.save(order);

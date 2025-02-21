@@ -12,10 +12,6 @@ Content-Type: application/json
   "paymentType":"카드"
 }
 
-### PATCH PAYMENT
-PATCH http://localhost:8080/api/payment/{payment-id}
-Content-Type: application/json
-
 
 ### DELETE PAYMENT
 DELETE http://localhost:8080/api/payment/{payment-id}

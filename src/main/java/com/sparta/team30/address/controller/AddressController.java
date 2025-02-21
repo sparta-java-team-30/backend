@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -91,7 +93,7 @@ public class AddressController {
                     schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     public ResponseEntity<Map<String,String>> addAddress(@AuthenticationPrincipal UserDetails userDetails,
-                                                         @RequestBody RequestCreateAddressDTO requestCreateAddressDTO) {
+                                                         @RequestBody @Valid RequestCreateAddressDTO requestCreateAddressDTO) {
         addressService.addAddress(userDetails, requestCreateAddressDTO);
 
         return ResponseEntity.ok(Map.of("message", "배송지 생성이 완료되었습니다."));
@@ -113,7 +115,7 @@ public class AddressController {
     @PutMapping("/{address-id}")
     public ResponseEntity<Map<String,String>> editAddress(@AuthenticationPrincipal UserDetails userDetails,
                                                           @PathVariable("address-id") UUID addressId,
-                                                          @RequestBody RequestUpdateAddressDTO requestUpdateAddressDTO) {
+                                                          @RequestBody @Valid RequestUpdateAddressDTO requestUpdateAddressDTO) {
 
         addressService.updateAddress(userDetails, addressId, requestUpdateAddressDTO);
 

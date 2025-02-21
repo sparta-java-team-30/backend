@@ -34,7 +34,6 @@ Content-Type: application/json
 
 {
   "comment":"일회용품 필요 없어요.",
-  "addressId":"de0740a5-2deb-4f0a-80b8-70427a16ed52"
 }
 
 ### DELETE ORDER

@@ -4,6 +4,8 @@ import com.sparta.team30.products.domain.Product;
 import com.sparta.team30.products.dto.ProductRequestDto;
 import com.sparta.team30.products.dto.ProductResponseDto;
 import com.sparta.team30.products.repository.ProductRepository;
+import com.sparta.team30.store.domain.Store;
+import com.sparta.team30.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,16 +19,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-
+    private final StoreRepository storeRepository;
     public ProductResponseDto createProduct(ProductRequestDto productRequestDto) {
         Product product = new Product();
 
         product.setProductName(productRequestDto.getProductName());
         product.setPrice(productRequestDto.getPrice());
 
-//        Store store = storeRepository.findById(productRequestDto.getStoreId())
-//                .orElseThrow(() -> new IllegalArgumentException("가게 아이디를 찾을 수 없습니다. " + productRequestDto.getStoreId()));
-//        product.setStore(store);
+        Store store = storeRepository.findById(productRequestDto.getStoreId())
+                .orElseThrow(() -> new IllegalArgumentException("가게 아이디를 찾을 수 없습니다. " + productRequestDto.getStoreId()));
+        product.setStore(store);
 
         Product savedProduct = productRepository.save(product);
 
