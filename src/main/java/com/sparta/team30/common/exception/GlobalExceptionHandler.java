@@ -137,6 +137,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+
     @ExceptionHandler(AddressAccessDeniedException.class)
     public ResponseEntity<ErrorResponse> AddressAccessDeniedException(AddressAccessDeniedException e) {
         return new ResponseEntity<>(
@@ -147,6 +148,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_ACCEPTABLE
         );
     }
+
     @ExceptionHandler(AlreadyPaidException.class)
     public ResponseEntity<ErrorResponse> AlreadyPaidException(AlreadyPaidException e) {
         return new ResponseEntity<>(
@@ -157,6 +159,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
+
     @ExceptionHandler(PaymentNotFoundException.class)
     public ResponseEntity<ErrorResponse> PaymentNotFoundException(PaymentNotFoundException e) {
         return new ResponseEntity<>(
@@ -187,6 +190,39 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build(),
                 HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> reviewNotFoundException(ReviewNotFoundException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(ReviewAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> reviewAccessDeniedException(ReviewAccessDeniedException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.FORBIDDEN.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(ReviewTimeExpiredException.class)
+    public ResponseEntity<ErrorResponse> reviewTimeExpiredException(ReviewTimeExpiredException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.GONE.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.GONE
         );
     }
 }
