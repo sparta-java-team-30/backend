@@ -4,6 +4,7 @@ import com.sparta.team30.carts.domain.Cart;
 import com.sparta.team30.carts.domain.CartItem;
 import com.sparta.team30.carts.dto.CartItemRequestDto;
 import com.sparta.team30.carts.dto.CartItemResponseDto;
+import com.sparta.team30.carts.dto.CartResponseDto;
 import com.sparta.team30.carts.repository.CartItemRepository;
 import com.sparta.team30.carts.repository.CartRepository;
 import com.sparta.team30.products.domain.Product;
@@ -28,6 +29,51 @@ public class CartService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
+    public UUID getCartId(Long userId) {
+        Optional<Cart> cart = cartRepository.findByUserId(userId);
+
+        if (cart.isEmpty()) {
+            return null;
+        }
+
+        CartResponseDto cartResponseDto = new CartResponseDto();
+        cartResponseDto.setCartId(cart.get().getCartId());
+        return cartResponseDto.getCartId();
+    }
+
+    public UUID createCart(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cartRepository.save(cart);
+
+        return getCartId(userId);
+    }
+
+    public Page<CartItemResponseDto> getCartItems(UUID cartId, int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<CartItem> cartItems = cartItemRepository.findByCart_CartId(cartId, pageable);
+
+        if (cartItems.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        Page<CartItemResponseDto> cartItemResponseDto = cartItems.map(cartItem -> {
+            CartItemResponseDto dto = new CartItemResponseDto();
+            dto.setCartId(cartItem.getCart().getCartId());
+            dto.setProductId(cartItem.getProduct().getProductId());
+            dto.setCount(cartItem.getCount());
+            return dto;
+        });
+
+        return cartItemResponseDto;
+    }
+
     public CartItemResponseDto addItemToCart(Long userId, CartItemRequestDto cartItemRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -46,11 +92,14 @@ public class CartService {
         cartItem.setProduct(product.get());
         cartItem.setCount(cartItemRequestDto.getCount());
 
-        cart.getCartItems().add(cartItem);
-
         cartItemRepository.save(cartItem);
 
         CartItemResponseDto cartItemResponseDto = new CartItemResponseDto();
+
+        cartItemResponseDto.setCartId(cart.getCartId());
+        cartItemResponseDto.setProductId(product.get().getProductId());
+        cartItemResponseDto.setCount(cartItem.getCount());
+
         return cartItemResponseDto;
     }
 
@@ -63,11 +112,15 @@ public class CartService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품이 장바구니에 없습니다."));
 
-        cart.getCartItems().add(cartItem);
+        cartItem.setCount(count);
 
         cartItemRepository.save(cartItem);
 
         CartItemResponseDto cartItemResponseDto = new CartItemResponseDto();
+        cartItemResponseDto.setCartId(cart.getCartId());
+        cartItemResponseDto.setProductId(cartItem.getProduct().getProductId());
+        cartItemResponseDto.setCount(cartItem.getCount());
+
         return cartItemResponseDto;
     }
 
@@ -82,32 +135,5 @@ public class CartService {
         }
 
         cartRepository.save(cart);
-    }
-
-    public UUID getCartId(Long userId) {
-        Optional<Cart> cart = cartRepository.findByUserId(userId);
-        return cart.map(Cart::getCartId).orElse(null);
-    }
-
-    public UUID createCart(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        Cart cart = new Cart();
-        cart.setUser(user);
-
-        cartRepository.save(cart);
-        return cart.getCartId();
-    }
-
-    public Page<CartItemResponseDto> getCartItems(UUID cartId, int page, int size, String sortBy, boolean isAsc) {
-        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        Page<CartItem> cartItems = cartItemRepository.findByCart_CartId(cartId, pageable);
-
-        return cartItems.map(cartItem -> new CartItemResponseDto(
-        ));
     }
 }
