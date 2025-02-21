@@ -1,4 +1,46 @@
-### GET Review
-GET GET
+### GET ALL REVIEWS BY STORE
+# 특정 가게의 모든 리뷰 조회
+GET http://localhost:8080/reviews/{storeId}/reviews
+Content-Type: application/json
+{
+  "storeId": "550e8400-e29b-41d4-a716-446655440002"
+}
 
-###
+### GET REVIEW DETAIL
+# 개인 리뷰 조회 (userId 기준)
+GET http://localhost:8080/reviews/{userId}
+Content-Type: application/json
+{
+  "reviewId": "550e8400-e29b-41d4-a716-446655440002"
+}
+
+### POST CREATE REVIEW
+# 새로운 리뷰 생성
+POST http://localhost:8080/reviews/create
+Content-Type: application/json
+
+{
+  "storeId": "550e8400-e29b-41d4-a716-446655440000",
+  "orderId": "550e8400-e29b-41d4-a716-446655440001",
+  "score": 4,
+  "content": "맜있어요."
+}
+
+### PUT UPDATE REVIEW
+# 특정 리뷰 수정
+PATCH http://localhost:8080/reviews/{reviewId}
+Content-Type: application/json
+
+{
+  "reviewId": "550e8400-e29b-41d4-a716-446655440002",
+  "score": 1,
+  "content": "맜있어요."
+}
+
+### DELETE REVIEW
+# 특정 리뷰 소프트 삭제
+DELETE http://localhost:8080/reviews/{reviewId}
+Content-Type: application/json
+{
+  "reviewId": "550e8400-e29b-41d4-a716-446655440002",
+}
