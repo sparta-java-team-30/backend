@@ -7,6 +7,7 @@ import com.sparta.team30.products.dto.ProductDetailResponseDto;
 import com.sparta.team30.products.repository.ProductDetailRepository;
 import com.sparta.team30.products.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,15 +32,15 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 
     @Transactional
     @Override
-    public ProductDetailResponseDto createProductDetail(UUID productId, ProductDetailRequestDto productDetailRequestDto) {
+    public ProductDetailResponseDto createProductDetail(UserDetails userDetails, UUID productId, ProductDetailRequestDto productDetailRequestDto) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(()-> new IllegalArgumentException("상품 없음"));
 
         ProductDetail productDetail = productDetailRepository.findByProductId(productId);
+
         if (productDetail != null){
             productDetail.productDetailDelete(IS_DELETED);
-            // TODO:Auditing 활성화를 위한 username 추가
-//            productDetail.delete(username);
+            productDetail.delete(userDetails.getUsername());
         }
 
         ProductDetail detail = ProductDetail.builder()
