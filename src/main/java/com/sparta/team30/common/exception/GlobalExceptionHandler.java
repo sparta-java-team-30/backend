@@ -197,10 +197,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> reviewNotFoundException(ReviewNotFoundException e) {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
-                        .statusCode(HttpStatus.CONFLICT.value())
+                        .statusCode(HttpStatus.NOT_FOUND.value())
                         .message(e.getMessage())
                         .build(),
-                HttpStatus.CONFLICT
+                HttpStatus.NOT_FOUND
         );
     }
 
@@ -208,10 +208,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> reviewAccessDeniedException(ReviewAccessDeniedException e) {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
-                        .statusCode(HttpStatus.CONFLICT.value())
+                        .statusCode(HttpStatus.FORBIDDEN.value())
                         .message(e.getMessage())
                         .build(),
-                HttpStatus.CONFLICT
+                HttpStatus.FORBIDDEN
         );
     }
 
@@ -219,10 +219,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> reviewTimeExpiredException(ReviewTimeExpiredException e) {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
-                        .statusCode(HttpStatus.CONFLICT.value())
+                        .statusCode(HttpStatus.GONE.value())
                         .message(e.getMessage())
                         .build(),
-                HttpStatus.CONFLICT
+                HttpStatus.GONE
         );
     }
 }
