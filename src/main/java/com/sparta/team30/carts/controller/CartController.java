@@ -83,8 +83,8 @@ public class CartController {
     })
     @DeleteMapping("/{userId}/items/{cartItemId}")
     public ResponseEntity<Void> deleteCartItem(
-            @Parameter(description = "장바구니 아이템 아이디", example = "550e8400-e29b-41d4-a716-446655440000") @PathVariable UUID cartItemId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @Parameter(description = "장바구니 아이템 아이디", example = "550e8400-e29b-41d4-a716-446655440000") @PathVariable UUID cartItemId
     ) {
         cartService.deleteCartItem(userDetails.getUser().getId(), cartItemId);
         return ResponseEntity.noContent().build();
