@@ -1,4 +1,4 @@
-package com.sparta.team30.infrastructure.security;
+package com.sparta.team30.common.security;
 
 import com.sparta.team30.user.domain.User;
 import com.sparta.team30.user.repository.UserRepository;

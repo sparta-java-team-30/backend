@@ -1,16 +1,14 @@
 package com.sparta.team30.user.controller;
 
-import com.sparta.team30.infrastructure.security.UserDetailsImpl;
-import com.sparta.team30.user.dto.UserDeleteRequestDto;
-import com.sparta.team30.user.dto.UserInfoUpdateRequestDto;
-import com.sparta.team30.user.dto.UserSignInRequestDto;
-import com.sparta.team30.user.dto.UserSignUpRequestDto;
-import com.sparta.team30.user.service.UserServiceImpl;
+import com.sparta.team30.common.security.UserDetailsImpl;
+import com.sparta.team30.user.dto.*;
+import com.sparta.team30.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,8 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "UserController", description = "회원 API")
+@Slf4j
 public class UserController {
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @Operation(summary = "user signup", description = "회원 가입 API")
     @ApiResponse(responseCode = "201", description = "회원 가입 성공 응답 없음")
@@ -41,6 +40,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "user info", description = "회원 정보 조회 API")
+    @ApiResponse(responseCode = "200", description = "정보 조회 성공")
+    @ApiResponse(responseCode = "401", description = "올바른 회원 정보가 아님")
+    @GetMapping("/info")
+    public ResponseEntity<UserInfoResponse> getUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        UserInfoResponse response = userService.getUserInfo(userDetails);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @PatchMapping
     public ResponseEntity<Void> updateUserInfo (@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                 @RequestBody @Valid UserInfoUpdateRequestDto userInfoUpdateRequestDto) {
@@ -53,5 +61,28 @@ public class UserController {
                                             @RequestBody UserDeleteRequestDto userDeleteRequestDto) {
         userService.deleteUser(userDetails, userDeleteRequestDto);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/roles/owner")
+    public ResponseEntity<Void> updateUserToOwner (@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                 @RequestBody @Valid UserRoleUpdateOwnerRequest request) {
+        userService.updateUserToOwner(userDetails, request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/roles/manager")
+    public ResponseEntity<Void> updateUserToMaster (@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                   @RequestBody @Valid UserRoleUpdateManagerRequest request) {
+        userService.updateUserToManager(userDetails, request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/roles/master")
+    public ResponseEntity<Void> updateUserToManager (@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                   @RequestBody @Valid UserRoleUpdateMasterRequest request) {
+        userService.updateUserToMaster(userDetails, request);
+        return ResponseEntity.ok().build();
     }
 }

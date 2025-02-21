@@ -1,4 +1,4 @@
-package com.sparta.team30.infrastructure.security;
+package com.sparta.team30.common.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.team30.common.util.TokenProvider;

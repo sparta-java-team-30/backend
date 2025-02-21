@@ -1,4 +1,4 @@
-package com.sparta.team30.infrastructure.config;
+package com.sparta.team30.common.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
