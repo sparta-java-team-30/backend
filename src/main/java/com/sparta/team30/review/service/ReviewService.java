@@ -36,7 +36,7 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public Page<Review> findAllReviewByStore(UUID storeId,String keyword,Pageable pageable) {
         // 음식점 검사
-        Store store = findStoreById(storeId);
+        findStoreById(storeId);
 
         return reviewRepository.findAllByStoreIdAndIsDeletedFalseWithKeyword(storeId,keyword, pageable);
     }
