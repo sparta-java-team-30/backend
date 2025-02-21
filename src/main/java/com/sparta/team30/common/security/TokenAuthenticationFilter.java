@@ -1,4 +1,4 @@
-package com.sparta.team30.infrastructure.security;
+package com.sparta.team30.common.security;
 
 import com.sparta.team30.common.util.TokenProvider;
 import jakarta.servlet.FilterChain;

@@ -1,16 +1,12 @@
 package com.sparta.team30.products.dto;
 
-import java.util.List;
+import lombok.Getter;
 
-public record ProductDetailHistoryResponseDto(
-        List<Candidate> candidates
-) {
-    public record Candidate(
-            Content content,
-            String finishReason
-    ) {}
-    public record Content(
-            List<Part> parts
-    ) {}
-    public record Part(String text) {}
+@Getter
+public class ProductDetailHistoryResponseDto {
+    private final String content;
+
+    public ProductDetailHistoryResponseDto(String content) {
+        this.content = content;
+    }
 }

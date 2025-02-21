@@ -1,4 +1,4 @@
-package com.sparta.team30.infrastructure.security;
+package com.sparta.team30.common.security;
 
 import com.sparta.team30.user.domain.User;
 import com.sparta.team30.user.domain.UserRoleEnum;
@@ -19,10 +19,12 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         UserRoleEnum role = user.getRole();
-        String authority = role.getAuthority();
 
-        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
-        return List.of(simpleGrantedAuthority);
+        List<String> authorities = UserRoleEnum.getAllAuthorities(role);
+
+        return authorities.stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.sparta.team30.products.controller;
 
-import com.sparta.team30.infrastructure.security.UserDetailsImpl;
+import com.sparta.team30.common.security.UserDetailsImpl;
 import com.sparta.team30.products.dto.ProductDetailRequestDto;
 import com.sparta.team30.products.dto.ProductDetailResponseDto;
 import com.sparta.team30.products.service.ProductDetailService;
@@ -18,17 +18,18 @@ public class ProductDetailController {
     private final ProductDetailService productDetailService;
 
     @GetMapping("/{productId}/details")
-    public ResponseEntity<ProductDetailResponseDto> getProductDetail(@PathVariable("productId") UUID productId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        userDetails.getUser().getId();
+    public ResponseEntity<ProductDetailResponseDto> getProductDetail(@PathVariable("productId") UUID productId){
         ProductDetailResponseDto response = productDetailService.getProductDetail(productId);
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{productId}/details")
-    public ResponseEntity<ProductDetailResponseDto> createProductDetail(@PathVariable("productId") UUID productId,
+    public ResponseEntity<ProductDetailResponseDto> createProductDetail(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable("productId") UUID productId,
                                               @RequestBody ProductDetailRequestDto productDetailRequestDto){
-        ProductDetailResponseDto productDetail = productDetailService.createProductDetail(productId, productDetailRequestDto);
+        ProductDetailResponseDto productDetail = productDetailService.createProductDetail(userDetails, productId, productDetailRequestDto);
         return ResponseEntity.ok(productDetail);
     }
 

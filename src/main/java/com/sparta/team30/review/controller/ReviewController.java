@@ -1,6 +1,6 @@
 package com.sparta.team30.review.controller;
 
-import com.sparta.team30.infrastructure.security.UserDetailsImpl;
+import com.sparta.team30.common.security.UserDetailsImpl;
 import com.sparta.team30.review.domain.Review;
 import com.sparta.team30.review.dto.ReviewCreateRequestDto;
 import com.sparta.team30.review.dto.ReviewResponseDto;

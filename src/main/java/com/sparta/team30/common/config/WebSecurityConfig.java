@@ -1,9 +1,9 @@
-package com.sparta.team30.infrastructure.config;
+package com.sparta.team30.common.config;
 
 import com.sparta.team30.common.util.TokenProvider;
-import com.sparta.team30.infrastructure.security.TokenAuthenticationFilter;
-import com.sparta.team30.infrastructure.security.TokenGenerateFilter;
-import com.sparta.team30.infrastructure.security.UserDetailsServiceImpl;
+import com.sparta.team30.common.security.TokenAuthenticationFilter;
+import com.sparta.team30.common.security.TokenGenerateFilter;
+import com.sparta.team30.common.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -36,13 +37,24 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.authorizeHttpRequests((authorization)-> authorization
-                .anyRequest().permitAll()
+                .requestMatchers("/api/auth/signup", "/api/auth/signin",
+                        "/h2-console/**", "/swagger-ui/**").permitAll()
+                .requestMatchers("/api/auth").hasRole("MANAGER")
+                .anyRequest().authenticated()
         );
 
         http.addFilterBefore(tokenAuthenticationFilter(), tokenGenerateFilter().getClass());
         http.addFilterBefore(tokenGenerateFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer(){
+        return (web) -> web.ignoring().requestMatchers(
+                "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**"
+                , "/swagger-resources/**"
+        );
     }
 
     @Bean
