@@ -48,6 +48,13 @@ public class Address extends BaseEntity {
         this.isDefault=true;
     }
 
+    //테스트 용도
+    public Address(UUID addressId, User user,boolean b) {
+        this.addressId = addressId;
+        this.user = user;
+        this.updateDefault(b);
+    }
+
     public void update(RequestUpdateAddressDTO requestUpdateAddressDTO) {
         this.userPostcode = requestUpdateAddressDTO.getUserPostcode();
         this.userAddress1 = requestUpdateAddressDTO.getUserAddress1();

@@ -2,9 +2,11 @@ package com.sparta.team30.address.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class RequestUpdateAddressDTO {
     @Schema(description = "우편번호", defaultValue = "98765")
     @NotNull(message = "우편번호를 입력해주세요")
