@@ -80,22 +80,36 @@ public class ProductService {
     }
 
     public ProductResponseDto updateProduct(UUID productId, ProductRequestDto productRequestDto) {
+        // 1. 기존 상품 정보 가져오기
         Optional<Product> existingProduct = productRepository.findById(productId);
         if (existingProduct.isPresent()) {
             Product product = existingProduct.get();
-            product.setProductName(productRequestDto.getProductName());
-            product.setPrice(productRequestDto.getPrice());
 
-            Product updatedProduct = productRepository.save(product);
+            // 2. Store 정보 가져오기
+            UUID storeId = productRequestDto.getStoreId();
+            Optional<Store> store = storeRepository.findById(storeId);
+            if (store.isPresent()) {
+                product.setProductName(productRequestDto.getProductName());
+                product.setPrice(productRequestDto.getPrice());
+                product.setStore(store.get());  // Store 정보 설정
 
-            ProductResponseDto productResponseDto = new ProductResponseDto();
-            productResponseDto.setProductId(updatedProduct.getProductId());
-            productResponseDto.setProductName(updatedProduct.getProductName());
-            productResponseDto.setPrice(updatedProduct.getPrice());
-            productResponseDto.setStoreId(updatedProduct.getStore().getStoreId());
+                // 3. 상품 업데이트 및 저장
+                Product updatedProduct = productRepository.save(product);
 
-            return productResponseDto;
+                // 4. 응답 DTO 생성
+                ProductResponseDto productResponseDto = new ProductResponseDto();
+                productResponseDto.setProductId(updatedProduct.getProductId());
+                productResponseDto.setProductName(updatedProduct.getProductName());
+                productResponseDto.setPrice(updatedProduct.getPrice());
+                productResponseDto.setStoreId(updatedProduct.getStore().getStoreId());
+
+                return productResponseDto;
+            } else {
+                // Store가 존재하지 않으면 null 반환
+                return null;
+            }
         } else {
+            // Product가 존재하지 않으면 null 반환
             return null;
         }
     }
