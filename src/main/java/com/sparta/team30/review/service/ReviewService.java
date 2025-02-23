@@ -100,7 +100,7 @@ public class ReviewService {
         if (userAuthority.equals(UserRoleEnum.Authority.CUSTOMER)) {
             // 사용자 본인 확인
             if (!user.getUsername().equals(username)) {
-                throw new ReviewAccessDeniedException("권한이 없습니다.");
+                throw new ReviewAccessDeniedException("본인이 작성한 리뷰만 수정할 수 있습니다.");
             }
 
             // 생성 후 3일 이내인지 확인
@@ -110,17 +110,15 @@ public class ReviewService {
                 throw new ReviewTimeExpiredException("리뷰는 생성 후 3일 이내에만 수정할 수 있습니다.");
             }
 
-        } else if (userAuthority.equals(UserRoleEnum.Authority.MASTER)) {
-            // MASTER는 시간 제한 없이 수정 가능
-                throw new ReviewAccessDeniedException("관리자만 리뷰를 수정할 수 있습니다.");
+        } else
+            if (userAuthority.equals(UserRoleEnum.Authority.MASTER)) {
         } else {
-            throw new ReviewAccessDeniedException("해당 작업은 USER 또는 MANAGER 역할만 수행할 수 있습니다.");
+            throw new ReviewAccessDeniedException("해당 작업은 USER 또는 MASTER 역할만 수행할 수 있습니다.");
         }
+        int oldScore = review.getScore();
         review.updateReview(requestDto.getScore(), requestDto.getContent());
 
-        UUID storeId = review.getStoreId().getStoreId();
-        int score = review.getScore();
-        updateStoreRating(storeId, score, requestDto.getScore());
+        updateStoreRating(review.getStoreId().getStoreId(), oldScore, requestDto.getScore());
     }
 
 
