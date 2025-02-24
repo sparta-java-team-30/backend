@@ -12,13 +12,13 @@ import com.sparta.team30.products.repository.ProductRepository;
 import com.sparta.team30.user.domain.User;
 import com.sparta.team30.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,25 +35,16 @@ public class CartService {
 
         Cart cart = new Cart();
         cart.setUser(user);
-        cartRepository.save(cart);
+        Cart savedCart = cartRepository.save(cart);
 
-        CartResponseDto cartResponseDto = new CartResponseDto();
-        cartResponseDto.setCartId(cart.getCartId());
-
-        return cartResponseDto.getCartId();
+        return savedCart.getCartId();
     }
 
     public UUID getCartId(Long userId) {
-        Optional<Cart> cart = cartRepository.findByUserId(userId);
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElse(null);
 
-        if (cart.isPresent()) {
-            CartResponseDto cartResponseDto = new CartResponseDto();
-            cartResponseDto.setCartId(cart.get().getCartId());
-
-            return cartResponseDto.getCartId();
-        } else {
-            return null;
-        }
+        return (cart != null) ? cart.getCartId() : null;
     }
 
     public CartItemResponseDto addItemToCart(Long userId, CartItemRequestDto cartItemRequestDto) {
@@ -67,19 +58,17 @@ public class CartService {
                     return cartRepository.save(newCart);
                 });
 
-        Optional<Product> product = productRepository.findById(cartItemRequestDto.getProductId());
+        Product product = productRepository.findById(cartItemRequestDto.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
         CartItem cartItem = new CartItem();
         cartItem.setCart(cart);
-        cartItem.setProduct(product.get());
+        cartItem.setProduct(product);
         cartItem.setCount(cartItemRequestDto.getCount());
-
-        cart.getCartItems().add(cartItem);
 
         cartItemRepository.save(cartItem);
 
-        CartItemResponseDto cartItemResponseDto = new CartItemResponseDto();
-        return cartItemResponseDto;
+        return new CartItemResponseDto(cartItem);
     }
 
     public CartItemResponseDto updateCartItem(Long userId, UUID cartItemId, int count) {
@@ -91,12 +80,10 @@ public class CartService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품이 장바구니에 없습니다."));
 
-        cart.getCartItems().add(cartItem);
-
+        cartItem.setCount(count);
         cartItemRepository.save(cartItem);
 
-        CartItemResponseDto cartItemResponseDto = new CartItemResponseDto();
-        return cartItemResponseDto;
+        return new CartItemResponseDto(cartItem);
     }
 
     public void deleteCartItem(Long userId, UUID cartItemId) {
@@ -112,13 +99,21 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    public Page<CartItemResponseDto> getCartItems(UUID cartId, int page, int size, String sortBy, boolean isAsc) {
-        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
+    public Page<CartItemResponseDto> getCartItems(Long userId, UUID cartId, int page, int size, String sortBy, boolean isAsc) {
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 장바구니를 찾을 수 없습니다."));
 
-        Page<CartItem> cartItems = cartItemRepository.findByCart_CartId(cartId, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(isAsc ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy));
 
-        return cartItems.map(CartItemResponseDto::from);
+        Page<CartItem> cartItemsPage = Optional.ofNullable(cartItemRepository.findByCart_CartId(cart.getCartId(), pageable))
+                .orElse(Page.empty());
+
+        System.out.println("cartItemsPage size: " + cartItemsPage.getTotalElements());
+
+        List<CartItemResponseDto> cartItemResponseDtos = cartItemsPage.getContent().stream()
+                .map(CartItemResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(cartItemResponseDtos, pageable, cartItemsPage.getTotalElements());
     }
 }

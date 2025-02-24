@@ -25,7 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class OrderService {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Not found " + username));
         UserRoleEnum role = user.getRole();
         OrderTypeEnum orderType = OrderTypeEnum.DELIVERY;
-        if(role.getAuthority().equals("ROLE_ADMIN")) {
+        if(role.getAuthority().equals("ROLE_OWNER")) {
             orderType = OrderTypeEnum.PICKUP;
         }
 
@@ -91,9 +91,7 @@ public class OrderService {
         //주문 상세 테이블에 주문 상품 추가.
         orderDetailService.addOrderProducts(order, productList);
 
-        return new ResponseCreateOrderDTO("주문이 완료되었습니다."
-            //,orderType
-        );
+        return new ResponseCreateOrderDTO("주문이 완료되었습니다.", orderType);
     }
 
     public Page<ResponseOrderHistoryDTO> getOrderHistory(

@@ -66,4 +66,8 @@ public class Payment extends BaseEntity {
         this.paymentStatus = paymentTypeEnum;
         this.isDeleted = true;
     }
+
+    public Payment(PaymentTypeEnum paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 }

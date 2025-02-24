@@ -43,7 +43,7 @@ public class CartController {
             cartId = cartService.createCart(userDetails.getUser().getId());
         }
 
-        Page<CartItemResponseDto> cartItemsResponseDto = cartService.getCartItems(cartId, page - 1, size, sortBy, isAsc);
+        Page<CartItemResponseDto> cartItemsResponseDto = cartService.getCartItems(userDetails.getUser().getId(), cartId, page - 1, size, sortBy, isAsc);
         return ResponseEntity.ok(cartItemsResponseDto);
     }
 
