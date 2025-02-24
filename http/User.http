@@ -1,7 +1,3 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=IntelliJ IDEA
-
 ### POST User Signup
 POST http://localhost:8080/api/auth/signup
 Content-Type: application/json
@@ -22,15 +18,47 @@ Content-Type: application/json
   "password": "Password1!"
 }
 
-### UPDATE User Info
-PATCH http://localhost:8080/api/auth
+### PATCH User Role to OWNER
+PATCH http://localhost:8080/api/auth/roles/owner
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZWFtMzAiLCJpYXQiOjE3Mzk5MjYzMjUsImV4cCI6MTczOTkzMzUyNSwic3ViIjoidXNlcjEiLCJpZCI6MSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9DVVNUT01FUiJdfQ.iporF-r3pdCW4R1p7ilJuT8_h_DVbQ8MG_04GXIw2UU
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZWFtMzAiLCJpYXQiOjE3NDAxMTU2ODYsImV4cCI6MTc0MDEyMjg4Niwic3ViIjoidXNlcjEiLCJpZCI6MSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9DVVNUT01FUiJdfQ.IthsD9_QOpKfPulodVuqwH1zX2YG4MVTxKZVIU3k6o4
 
 {
-  "email": "email1@email.com",
-  "nickname": "myuser",
-  "isPublic": true
+  "businessNumber": "11223344166"
+}
+
+### PATCH User Role to MANAGER
+PATCH http://localhost:8080/api/auth/roles/manager
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZWFtMzAiLCJpYXQiOjE3NDAxMTU0NDQsImV4cCI6MTc0MDEyMjY0NCwic3ViIjoidXNlcjEiLCJpZCI6MSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9DVVNUT01FUiJdfQ.ePVdWxFC7MSMo56ZbQkEHjQaTUACbdUqGE_m5TbTSek
+
+{
+  "secretCode": "7Ius7ZmUM+q4sCAzMOyhsCDrp6Tri4jsoIA="
+}
+
+### PATCH User Role to MASTER
+PATCH http://localhost:8080/api/auth/roles/master
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZWFtMzAiLCJpYXQiOjE3NDAxMTUzMzYsImV4cCI6MTc0MDEyMjUzNiwic3ViIjoidXNlcjEiLCJpZCI6MSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9DVVNUT01FUiJdfQ.a-IL2WybH-nHxVsHwMI1Na5qfFZhWdp_yi0LsOyj_EQ
+
+{
+  "secretCode": "7Ius7ZmUM+q4sCAzMOyhsCDrp4jsiqTthLA="
+}
+
+### GET User Info
+GET http://localhost:8080/api/auth/info
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZWFtMzAiLCJpYXQiOjE3NDAxMDg4ODMsImV4cCI6MTc0MDExNjA4Mywic3ViIjoidXNlcjEiLCJpZCI6MSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9DVVNUT01FUiJdfQ.89iZcd2ZC_h8wTY_idc0Gc-cx8QseMMxEWeUT2oBpfQ
+
+### PATCH User Info
+PATCH http://localhost:8080/api/auth
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0ZWFtMzAiLCJpYXQiOjE3NDAxMTU1NjAsImV4cCI6MTc0MDEyMjc2MCwic3ViIjoidXNlcjEiLCJpZCI6MSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9DVVNUT01FUiJdfQ.8ZRw4CZ8d6iClbHFJ43vq1cOmZcXCZ1_Yo_Hw_LkHXo
+
+{
+  "email": "email2@email.com",
+  "nickname": "myuser123",
+  "isPublic": false
 }
 
 ### DELETE User

@@ -4,6 +4,7 @@ import com.sparta.team30.carts.domain.Cart;
 import com.sparta.team30.carts.domain.CartItem;
 import com.sparta.team30.carts.dto.CartItemRequestDto;
 import com.sparta.team30.carts.dto.CartItemResponseDto;
+import com.sparta.team30.carts.dto.CartResponseDto;
 import com.sparta.team30.carts.repository.CartItemRepository;
 import com.sparta.team30.carts.repository.CartRepository;
 import com.sparta.team30.products.domain.Product;
@@ -27,6 +28,33 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+
+    public UUID createCart(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cartRepository.save(cart);
+
+        CartResponseDto cartResponseDto = new CartResponseDto();
+        cartResponseDto.setCartId(cart.getCartId());
+
+        return cartResponseDto.getCartId();
+    }
+
+    public UUID getCartId(Long userId) {
+        Optional<Cart> cart = cartRepository.findByUserId(userId);
+
+        if (cart.isPresent()) {
+            CartResponseDto cartResponseDto = new CartResponseDto();
+            cartResponseDto.setCartId(cart.get().getCartId());
+
+            return cartResponseDto.getCartId();
+        } else {
+            return null;
+        }
+    }
 
     public CartItemResponseDto addItemToCart(Long userId, CartItemRequestDto cartItemRequestDto) {
         User user = userRepository.findById(userId)
@@ -84,22 +112,6 @@ public class CartService {
         cartRepository.save(cart);
     }
 
-    public UUID getCartId(Long userId) {
-        Optional<Cart> cart = cartRepository.findByUserId(userId);
-        return cart.map(Cart::getCartId).orElse(null);
-    }
-
-    public UUID createCart(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        Cart cart = new Cart();
-        cart.setUser(user);
-
-        cartRepository.save(cart);
-        return cart.getCartId();
-    }
-
     public Page<CartItemResponseDto> getCartItems(UUID cartId, int page, int size, String sortBy, boolean isAsc) {
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortBy);
@@ -107,7 +119,6 @@ public class CartService {
 
         Page<CartItem> cartItems = cartItemRepository.findByCart_CartId(cartId, pageable);
 
-        return cartItems.map(cartItem -> new CartItemResponseDto(
-        ));
+        return cartItems.map(CartItemResponseDto::from);
     }
 }

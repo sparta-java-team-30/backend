@@ -31,6 +31,9 @@ public class User extends BaseEntity {
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
 
+    @Column(name = "business_number")
+    private String businessNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private UserRoleEnum role;
@@ -43,6 +46,15 @@ public class User extends BaseEntity {
         this.nickname = nickname;
         this.isPublic = isPublic;
         this.role = role;
+    }
+
+    public void updateRole(UserRoleEnum userRoleEnum){
+        this.role = userRoleEnum;
+    }
+
+    public void updateRoleOwner(String businessNumber){
+        this.businessNumber = businessNumber;
+        this.role = UserRoleEnum.OWNER;
     }
 
     public void updateEmail(String email) {

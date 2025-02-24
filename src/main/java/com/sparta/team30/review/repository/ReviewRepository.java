@@ -2,11 +2,13 @@ package com.sparta.team30.review.repository;
 
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.review.domain.Review;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -15,17 +17,19 @@ import java.util.UUID;
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
     //중복
     boolean existsByOrderId(Order orderId);
-    //N+1 방지 Fatch Join
-    @Query("SELECT r FROM Review r " +
-            "JOIN FETCH r.user " +
-            "WHERE r.storeId.storeId = :storeId AND r.isDeleted = false")
-    List<Review> findAllByStoreAndIsDeletedFalse(@Param("storeId") UUID storeId);
 
-//    //소프트삭제 처리
-    @Modifying
-    @Transactional
-    @Query("update Review r SET r.isDeleted=true where r.reviewId= :reviewId")
-    void deleteByReviewId(UUID reviewId);
+    @EntityGraph(value = "Review.withUserAndStore", type = EntityGraph.EntityGraphType.FETCH)
+    @Query("SELECT r FROM Review r WHERE r.storeId.storeId = :storeId " +
+            "AND r.isDeleted = false " +
+            "AND (:keyword IS NULL OR LOWER(r.content) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<Review> findAllByStoreIdAndIsDeletedFalseWithKeyword(
+            @Param("storeId") UUID storeId,
+            @Param("keyword") String keyword,
+            Pageable pageable);
+
+    @EntityGraph(attributePaths = {"storeId", "orderId"})
+    List<Review> findAllByUserIdAndIsDeletedFalse(Long id);
+
 
     Optional<Review> findByReviewIdAndIsDeletedFalse(UUID storeId);
 

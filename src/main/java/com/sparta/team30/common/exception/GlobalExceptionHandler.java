@@ -1,5 +1,6 @@
 package com.sparta.team30.common.exception;
 
+import com.sparta.team30.category.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -137,6 +138,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+
     @ExceptionHandler(AddressAccessDeniedException.class)
     public ResponseEntity<ErrorResponse> AddressAccessDeniedException(AddressAccessDeniedException e) {
         return new ResponseEntity<>(
@@ -147,6 +149,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_ACCEPTABLE
         );
     }
+
     @ExceptionHandler(AlreadyPaidException.class)
     public ResponseEntity<ErrorResponse> AlreadyPaidException(AlreadyPaidException e) {
         return new ResponseEntity<>(
@@ -157,6 +160,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
+
     @ExceptionHandler(PaymentNotFoundException.class)
     public ResponseEntity<ErrorResponse> PaymentNotFoundException(PaymentNotFoundException e) {
         return new ResponseEntity<>(
@@ -181,6 +185,61 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateStoreException.class)
     public ResponseEntity<ErrorResponse> duplicateStoreException(DuplicateStoreException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> reviewNotFoundException(ReviewNotFoundException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(ReviewAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> reviewAccessDeniedException(ReviewAccessDeniedException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.FORBIDDEN.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(ReviewTimeExpiredException.class)
+    public ResponseEntity<ErrorResponse> reviewTimeExpiredException(ReviewTimeExpiredException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.GONE.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.GONE
+        );
+    }
+
+    @ExceptionHandler(CategoryAlreadyDeleteException.class)
+    public ResponseEntity<ErrorResponse> categoryAlreadyDeleteException(CategoryAlreadyDeleteException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.GONE.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.GONE
+        );
+    }
+
+    @ExceptionHandler(DuplicateCategoryException.class)
+    public ResponseEntity<ErrorResponse> duplicateCategoryException(DuplicateCategoryException e) {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
                         .statusCode(HttpStatus.CONFLICT.value())

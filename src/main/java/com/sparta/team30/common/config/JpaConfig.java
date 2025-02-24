@@ -1,4 +1,4 @@
-package com.sparta.team30.infrastructure.config;
+package com.sparta.team30.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

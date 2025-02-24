@@ -3,13 +3,13 @@ package com.sparta.team30.user.service;
 import com.sparta.team30.common.exception.UserEmailAlreadyExistsException;
 import com.sparta.team30.common.exception.UserPasswordIncorrectException;
 import com.sparta.team30.common.exception.UsernameAlreadyExistsException;
+import com.sparta.team30.common.security.UserDetailsImpl;
 import com.sparta.team30.user.domain.User;
 import com.sparta.team30.user.domain.UserRoleEnum;
-import com.sparta.team30.user.dto.UserDeleteRequestDto;
-import com.sparta.team30.user.dto.UserInfoUpdateRequestDto;
-import com.sparta.team30.user.dto.UserSignUpRequestDto;
+import com.sparta.team30.user.dto.*;
 import com.sparta.team30.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
     private static final String DEFAULT_USER_CREATED_BY = "SYSTEM";
     private static final boolean DEFAULT_IS_PUBLIC = true;
+    @Value("${secret.code.master}")
+    private String MASTER_SECRET_CODE;
+    @Value("${secret.code.manager}")
+    private String MANAGER_SECRET_CODE;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -80,6 +84,61 @@ public class UserServiceImpl implements UserService {
             throw new UserPasswordIncorrectException("비밀번호가 일치하지 않습니다.");
         }
         user.deleteUser(username);
+    }
+
+    @Transactional
+    @Override
+    public void updateUserToOwner(UserDetails userDetails, UserRoleUpdateOwnerRequest request) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("해당 username을 찾을 수 없습니다."));
+
+        if (UserRoleEnum.OWNER.equals(user.getRole()) ||
+                UserRoleEnum.MANAGER.equals(user.getRole()) ||
+                UserRoleEnum.MASTER.equals(user.getRole())) {
+            throw new IllegalArgumentException("잘못된 요청입니다.");
+        }
+
+        user.updateRoleOwner(request.getBusinessNumber());
+    }
+
+    @Override
+    public UserInfoResponse getUserInfo(UserDetails userDetails) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("해당 username을 찾을 수 없습니다."));
+
+        return UserInfoResponse.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .isPublic(user.getIsPublic())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public void updateUserToManager(UserDetailsImpl userDetails, UserRoleUpdateManagerRequest request) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("해당 username을 찾을 수 없습니다."));
+        if (isCorrectSecretCode(request.getSecretCode(), MANAGER_SECRET_CODE)) {
+            throw new IllegalArgumentException("잘못된 요청입니다.");
+        }
+        user.updateRole(UserRoleEnum.MANAGER);
+    }
+
+    @Transactional
+    @Override
+    public void updateUserToMaster(UserDetailsImpl userDetails, UserRoleUpdateMasterRequest request) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("해당 username을 찾을 수 없습니다."));
+        if (isCorrectSecretCode(request.getSecretCode(), MASTER_SECRET_CODE)) {
+            throw new IllegalArgumentException("잘못된 요청입니다.");
+        }
+        user.updateRole(UserRoleEnum.MASTER);
+    }
+
+    private boolean isCorrectSecretCode(String secretCode, String SECRET_CODE) {
+        return !secretCode.equals(SECRET_CODE);
     }
 
     private String getUsername(UserDetails userDetails) {

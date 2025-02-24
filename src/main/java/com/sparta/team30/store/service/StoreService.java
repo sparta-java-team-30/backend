@@ -2,7 +2,7 @@ package com.sparta.team30.store.service;
 
 import com.sparta.team30.category.domain.Category;
 import com.sparta.team30.category.respository.CategoryRepository;
-import com.sparta.team30.common.exception.CategoryNotFoundException;
+import com.sparta.team30.category.exception.CategoryNotFoundException;
 import com.sparta.team30.common.exception.DuplicateStoreException;
 import com.sparta.team30.common.exception.StoreNotFoundException;
 import com.sparta.team30.store.domain.Store;

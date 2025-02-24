@@ -21,5 +21,10 @@ public class ReviewResponseDto {
 
 
     public ReviewResponseDto(Review review) {
+        this.reviewId = review.getReviewId();
+        this.storeId = review.getStoreId().getStoreId();
+        this.orderId = review.getOrderId().getOrderId();
+        this.score = review.getScore();
+        this.content = review.getContent();
     }
 }
