@@ -2,11 +2,13 @@ package com.sparta.team30.payment.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.UUID;
 
 @Getter
+@AllArgsConstructor
 public class RequestPaymentByOrderId {
     private UUID orderId;
     @Schema(description = "결제종류", defaultValue = "카드결제")
