@@ -1,5 +1,6 @@
 package com.sparta.team30.store.controller;
 
+import com.sparta.team30.common.security.UserDetailsImpl;
 import com.sparta.team30.store.dto.*;
 import com.sparta.team30.store.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,7 +12,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -58,9 +62,25 @@ public class StoreController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "내 음식점 조회", description = "내 음식점을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "내 음식점 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "음식점을 찾을 수 없음")
+    })
+    @GetMapping("/stores/my")
+//    @PreAuthorize("hasRole('ROLE_OWNER')")
+    public ResponseEntity<StoreResponseDto> getMyStore(
+            @Parameter(description = "지금 로그인 중인 유저")
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        StoreResponseDto response = storeService.getMyStore(userDetails.getUser());
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "승인되지 않은 음식점 조회", description = "음식점 등록 후 아직 승인되지 않은 음식점을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "음식점 조회 성공")
     @GetMapping("/stores/unapproved")
+//    @PreAuthorize("hasAnyRole('ROLE_MANAGER','ROLE_ADMIN')")
     public Page<StoreListResponseDto> getUnapprovedStores(
             @Parameter(description = "페이지 번호")
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
@@ -81,8 +101,12 @@ public class StoreController {
             @ApiResponse(responseCode = "409", description = "음식점 등록 실패"),
     })
     @PostMapping("/stores")
-    public ResponseEntity<StoreCreateResponseDto> createStore (@RequestBody @Valid StoreRequestDto requestDto) {
-        StoreCreateResponseDto response = storeService.createStore(requestDto);
+//    @PreAuthorize("hasAnyRole('ROLE_OWNER','ROLE_MANAGER','ROLE_ADMIN')")
+    public ResponseEntity<StoreCreateResponseDto> createStore (
+            @RequestBody @Valid StoreRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        StoreCreateResponseDto response = storeService.createStore(requestDto, userDetails.getUser());
         return ResponseEntity.ok(response);
     }
 
@@ -92,12 +116,12 @@ public class StoreController {
             @ApiResponse(responseCode = "404", description = "음식점을 찾을 수 없음")
     })
     @PatchMapping("/stores/{store-id}")
-//    @Secured({"ROLE_MANAGER", "ROLE_MASTER"})
+//    @PreAuthorize("hasAnyRole('ROLE_MANAGER','ROLE_ADMIN')")
     public ResponseEntity<StoreApproveResponseDto> approveStore(
             @Parameter(description = "승인할 음식점 UUID")
-            @PathVariable("store-id") UUID uuid
+            @PathVariable("store-id") UUID storeId
     ) {
-        StoreApproveResponseDto response = storeService.approveStore(uuid);
+        StoreApproveResponseDto response = storeService.approveStore(storeId);
         return ResponseEntity.ok(response);
     }
 
@@ -107,14 +131,15 @@ public class StoreController {
             @ApiResponse(responseCode = "404", description = "음식점 수정 실패")
     })
     @PutMapping("/stores/{store-id}")
-//    @Secured({"ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER"})
+    //@PreAuthorize("hasAnyRole('ROLE_MANAGER','ROLE_ADMIN') or @storeService.isOwner(#storeId, authentication.getPrincipal())")
+    @PreAuthorize("@storeService.isOwner(#storeId, authentication.getPrincipal())")
     public ResponseEntity<StoreResponseDto> updateStore(
             @Parameter(description = "수정할 음식점 UUID")
-            @PathVariable("store-id") UUID uuid,
+            @PathVariable("store-id") UUID storeId,
             @Parameter(description = "수정할 음식점 데이터")
             @RequestBody @Valid StoreUpdateRequestDto requestDto
     ) {
-        StoreResponseDto response = storeService.updateStore(uuid, requestDto);
+        StoreResponseDto response = storeService.updateStore(storeId, requestDto);
         return ResponseEntity.ok(response);
     }
 
@@ -124,12 +149,14 @@ public class StoreController {
             @ApiResponse(responseCode = "404", description = "음식점을 찾을 수 없음")
     })
     @DeleteMapping("/stores/{store-id}")
-//    @Secured({"ROLE_OWNER", "ROLE_MANAGER", "ROLE_MASTER"})
+    //@PreAuthorize("hasAnyRole('ROLE_MANAGER','ROLE_ADMIN') or @storeService.isOwner(#storeId, authentication.getPrincipal())")
     public ResponseEntity<StoreDeleteResponseDto> deleteStore(
             @Parameter(description = "삭제할 음식점 UUID")
-            @PathVariable("store-id") UUID uuid
+            @PathVariable("store-id") UUID storeId,
+            @Parameter(description = "삭제할 사용자")
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        StoreDeleteResponseDto response = storeService.deleteStore(uuid, "tempUser");
+        StoreDeleteResponseDto response = storeService.deleteStore(storeId, userDetails.getUsername());
         return ResponseEntity.ok(response);
     }
 }
