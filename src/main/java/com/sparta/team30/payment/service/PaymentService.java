@@ -54,18 +54,16 @@ public class PaymentService {
 
         //결제 외부 pg사로 요청 후 응답 메시지 받아온다고 가정.
         //ResponsePaymentDTO responsePaymentDTO = requestPaymentToPG(paymentSampleDTO);
-        ResponsePGPaymentDTO responsePGPaymentDTO;
 
-        double v = Math.random() * 10;
+        //결제 성공 확률 80%
+        boolean isSuccess = Math.random() * 10 <= 8;
 
-        if(v<=8){ //결제 성공 확률 80%
-            responsePGPaymentDTO = new ResponsePGPaymentDTO("국민은행","카드결제",true);
+        if(isSuccess) {
             order.updateStatus("주문 완료");
-        } else{
-            responsePGPaymentDTO = new ResponsePGPaymentDTO("국민은행","카드결제",false);
         }
-        Boolean update = payment.update(responsePGPaymentDTO);
-        return new ResponseCreatePaymentDTO(payment.getPaymentId(), update);
+
+        ResponsePGPaymentDTO responsePGPaymentDTO = new ResponsePGPaymentDTO("국민은행","카드결제",isSuccess);
+        return new ResponseCreatePaymentDTO(payment.getPaymentId(), responsePGPaymentDTO.isSuccess());
     }
 
     //하나 주문에 대한 결제 내역 조회

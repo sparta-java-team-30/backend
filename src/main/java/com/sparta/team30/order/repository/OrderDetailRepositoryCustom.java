@@ -1,6 +1,6 @@
 package com.sparta.team30.order.repository;
 
-import com.sparta.team30.order.domain.Order;
+
 import com.sparta.team30.order.dto.ResponseOrderProductDTO;
 
 import java.util.List;

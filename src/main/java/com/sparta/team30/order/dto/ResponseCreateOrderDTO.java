@@ -10,7 +10,8 @@ public class ResponseCreateOrderDTO {
     private String message;
     private OrderTypeEnum orderType;
 
-    public ResponseCreateOrderDTO(String message) {
+    public ResponseCreateOrderDTO(String message, OrderTypeEnum orderType) {
         this.message = message;
+        this.orderType = orderType;
     }
 }

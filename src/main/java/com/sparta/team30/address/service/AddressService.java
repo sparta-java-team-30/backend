@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -47,7 +46,7 @@ public class AddressService {
     public void addAddress(UserDetails userDetails, RequestCreateAddressDTO requestCreateAddressDTO) {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
-        clearLatestAddressDefault(userDetails.getUsername());
+        clearOtherAddressDefault(userDetails.getUsername());
         addressRepository.save(new Address(user, requestCreateAddressDTO));
     }
 
@@ -57,7 +56,7 @@ public class AddressService {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
         Address address = addressRepository.findById(addressId).orElseThrow(() -> new AddressNotFoundException("존재하지 않는 주소입니다."));
 
-        clearLatestAddressDefault(userDetails.getUsername());
+        clearOtherAddressDefault(userDetails.getUsername());
 
         address.updateDefault(true);
     }
@@ -88,7 +87,7 @@ public class AddressService {
     }
 
 
-    private void clearLatestAddressDefault(String username) {
+    private void clearOtherAddressDefault(String username) {
         long l = addressRepository.clearAllAdressFalse(username);
     }
 
