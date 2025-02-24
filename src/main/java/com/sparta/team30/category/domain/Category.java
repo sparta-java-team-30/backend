@@ -10,7 +10,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -26,10 +25,10 @@ public class Category extends BaseEntity {
     @Column(name = "category_id", updatable = false, nullable = false)
     private UUID categoryId;
 
-    @Column(name = "category_name", nullable = false)
+    @Column(name = "category_name", nullable = false, unique = true)
     private String categoryName;
 
-    @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
     public Category(CategoryRequestDto requestDto) {

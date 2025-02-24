@@ -8,27 +8,17 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Schema(description = "카테고리 응답 DTO")
+@Schema(description = "카테고리 삭제 응답 DTO")
 @Getter
 @NoArgsConstructor
-public class CategoryResponseDto {
+public class CategoryDeleteResponseDto {
     private UUID categoryId;
-    private String categoryName;
-    private LocalDateTime createdAt;
-    private String createdBy;
-    private LocalDateTime updatedAt;
-    private String updatedBy;
     private LocalDateTime deletedAt;
     private String deletedBy;
     private Boolean isDeleted;
 
-    public CategoryResponseDto(Category category){
+    public CategoryDeleteResponseDto(Category category){
         this.categoryId = category.getCategoryId();
-        this.categoryName = category.getCategoryName();
-        this.createdAt = category.getCreatedAt();
-        this.createdBy = category.getCreatedBy();
-        this.updatedAt = category.getUpdatedAt();
-        this.updatedBy = category.getUpdatedBy();
         this.deletedAt = category.getDeletedAt();
         this.deletedBy = category.getDeletedBy();
         this.isDeleted = category.getIsDeleted();
