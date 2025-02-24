@@ -35,4 +35,12 @@ public class CartItemResponseDto {
         dto.setCount(cartItem.getCount());
         return dto;
     }
+
+    public CartItemResponseDto(CartItem cartItem) {
+        this.cartItemId = cartItem.getCartItemId();
+        this.cartId = cartItem.getCart().getCartId();
+        this.productId = cartItem.getProduct().getProductId();
+        this.productName = cartItem.getProduct().getProductName();
+        this.count = cartItem.getCount();
+    }
 }
