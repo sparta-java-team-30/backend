@@ -1,7 +1,6 @@
 package com.sparta.team30.order.controlller;
 
 import com.sparta.team30.common.exception.ErrorResponse;
-import com.sparta.team30.infrastructure.security.UserDetailsImpl;
 import com.sparta.team30.order.dto.RequestCreateOrderDTO;
 import com.sparta.team30.order.dto.RequestUpdateOrderDTO;
 import com.sparta.team30.order.dto.ResponseOrderDetailsDTO;
@@ -18,11 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.print.Pageable;
+
 import java.util.Map;
 import java.util.UUID;
 @Tag(name = "Order API", description = "주문 관련 API")
