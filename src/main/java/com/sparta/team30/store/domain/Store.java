@@ -1,6 +1,7 @@
 package com.sparta.team30.store.domain;
 
 import com.sparta.team30.category.domain.Category;
+import com.sparta.team30.category.dto.CategoryDto;
 import com.sparta.team30.common.domain.BaseEntity;
 import com.sparta.team30.store.dto.StoreRequestDto;
 import com.sparta.team30.user.domain.User;
@@ -37,7 +38,6 @@ public class Store extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    //    @ManyToOne(fetch = FetchType.LAZY)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User owner;
@@ -87,8 +87,8 @@ public class Store extends BaseEntity {
         }
     }
 
-    public Store(Category category, StoreRequestDto requestDto, User user) {
-        this.category = category;
+    public Store(CategoryDto categoryDto, StoreRequestDto requestDto, User user) {
+        this.category = new Category(categoryDto);
         this.owner = user;
         this.storeName = requestDto.getStoreName();
         this.storePhone = requestDto.getStorePhone();
@@ -96,10 +96,6 @@ public class Store extends BaseEntity {
         this.storeAddress1 = requestDto.getStoreAddress1();
         this.storeAddress2 = requestDto.getStoreAddress2();
     }
-
-//    public void approve() {
-//        this.isApproved = true;
-//    }
 
     @Override
     public void delete(String deletedBy) {

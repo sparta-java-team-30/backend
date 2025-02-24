@@ -1,5 +1,6 @@
 package com.sparta.team30.category.domain;
 
+import com.sparta.team30.category.dto.CategoryDto;
 import com.sparta.team30.category.dto.CategoryRequestDto;
 import com.sparta.team30.common.domain.BaseEntity;
 import jakarta.persistence.*;
@@ -33,6 +34,11 @@ public class Category extends BaseEntity {
 
     public Category(CategoryRequestDto requestDto) {
         this.categoryName = requestDto.getCategoryName();
+    }
+
+    public Category(CategoryDto categoryDto) {
+        this.categoryId = categoryDto.getCategoryId();
+        this.categoryName = categoryDto.getCategoryName();
     }
 
     public void update(CategoryRequestDto requestDto) {

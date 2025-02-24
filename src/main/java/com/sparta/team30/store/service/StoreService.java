@@ -1,8 +1,6 @@
 package com.sparta.team30.store.service;
 
-import com.sparta.team30.category.domain.Category;
-import com.sparta.team30.category.respository.CategoryRepository;
-import com.sparta.team30.category.exception.CategoryNotFoundException;
+import com.sparta.team30.category.dto.CategoryDto;
 import com.sparta.team30.category.service.CategoryService;
 import com.sparta.team30.common.exception.DuplicateStoreException;
 import com.sparta.team30.common.exception.StoreNotFoundException;
@@ -27,7 +25,7 @@ import java.util.UUID;
 public class StoreService {
 
     private final StoreRepository storeRepository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
     public Page<StoreListResponseDto> getStores(
             int page,
@@ -85,11 +83,8 @@ public class StoreService {
             throw new DuplicateStoreException("중복된 음식점이 이미 존재합니다.");
         }
 
-        Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(() ->
-                new CategoryNotFoundException("카테고리를 찾을 수 없습니다.")
-        );
-
-        Store store = storeRepository.save(new Store(category, requestDto, owner));
+        CategoryDto categoryDto = categoryService.getCategoryById(requestDto.getCategoryId());
+        Store store = storeRepository.save(new Store(categoryDto, requestDto, owner));
         return new StoreCreateResponseDto(store);
     }
 
@@ -122,9 +117,7 @@ public class StoreService {
             throw new StoreNotApproveException("승인되지 않은 음식점입니다.");
 
         if (requestDto.getCategoryId() != null) {
-            categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(() ->
-                    new CategoryNotFoundException("카테고리를 찾을 수 없습니다.")
-            );
+            categoryService.categoryExists(requestDto.getCategoryId());
         }
 
         long count = storeRepository.updateStore(storeId, requestDto);
