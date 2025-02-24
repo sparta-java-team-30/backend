@@ -1,5 +1,6 @@
 package com.sparta.team30.common.exception;
 
+import com.sparta.team30.category.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -223,6 +224,28 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build(),
                 HttpStatus.GONE
+        );
+    }
+
+    @ExceptionHandler(CategoryAlreadyDeleteException.class)
+    public ResponseEntity<ErrorResponse> categoryAlreadyDeleteException(CategoryAlreadyDeleteException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.GONE.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.GONE
+        );
+    }
+
+    @ExceptionHandler(DuplicateCategoryException.class)
+    public ResponseEntity<ErrorResponse> duplicateCategoryException(DuplicateCategoryException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.CONFLICT
         );
     }
 }
