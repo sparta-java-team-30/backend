@@ -7,6 +7,8 @@ import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.review.domain.Review;
 import com.sparta.team30.review.dto.ReviewCreateRequestDto;
 import com.sparta.team30.review.dto.ReviewResponseDto;
+import com.sparta.team30.review.exception.DuplicateReviewException;
+import com.sparta.team30.review.exception.InvalidReviewContentException;
 import com.sparta.team30.review.repository.ReviewRepository;
 import com.sparta.team30.store.domain.Store;
 import com.sparta.team30.store.dto.StoreRequestDto;
@@ -110,7 +112,7 @@ public class ReviewCreateTest {
         when(reviewRepository.existsByOrderId(order)).thenReturn(true);
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        DuplicateReviewException exception = assertThrows(DuplicateReviewException.class, () ->
                 reviewService.addReview(requestDto, "testUser")
         );
 
@@ -140,9 +142,10 @@ public class ReviewCreateTest {
         when(reviewRepository.existsByOrderId(order)).thenReturn(false);
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        InvalidReviewContentException exception = assertThrows(InvalidReviewContentException.class, () ->
                 reviewService.addReview(requestDto, "testUser")
         );
+
 
         assertEquals("리뷰내용은 최대 255자까지 가능합니다.", exception.getMessage());
         verify(reviewRepository, never()).save(any(Review.class));
