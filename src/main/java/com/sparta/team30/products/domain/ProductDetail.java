@@ -18,7 +18,7 @@ public class ProductDetail extends BaseEntity {
 
     @Id
     @UuidGenerator
-    @Column(columnDefinition = "BINARY(16)", name = "product_detail_id")
+    @Column(name = "product_detail_id")
     private UUID productDetailId;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
@@ -38,7 +38,12 @@ public class ProductDetail extends BaseEntity {
         this.isDeleted = isDeleted;
     }
 
-    public void productDetailDelete(boolean isDeleted){
+    public void update(String productDetailContent) {
+        this.productDetailContent = productDetailContent;
+    }
+
+    public void productDetailDelete(boolean isDeleted, String deletedBy) {
+        super.delete(deletedBy);
         this.isDeleted = isDeleted;
     }
 }
