@@ -15,9 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -82,10 +80,9 @@ public class StoreController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "내 음식점 주문 목록", description = "내 음식점 주문 목록을 조회합니다.")
+    @Operation(summary = "내 음식점 주문, 결제 목록", description = "내 음식점 주문, 결제 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "내 음식점 주문 목록 조회 성공")
     @GetMapping("/stores/my/order")
-//    @PreAuthorize("@storeService.isOwner(#storeId, authentication.getPrincipal())")
     public ResponseEntity<List<ResponseMyStoreOrderListDTO>> getMyStoreOrderList(
             @Parameter(description = "지금 로그인 중인 유저")
             @AuthenticationPrincipal UserDetailsImpl userDetails
