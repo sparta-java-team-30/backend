@@ -7,6 +7,7 @@ import com.sparta.team30.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
                 @NamedAttributeNode("orderId")
         })
 @Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "P_REVIEW")
 public class Review extends BaseEntity {
@@ -68,6 +70,7 @@ public class Review extends BaseEntity {
         this.score = score;
         this.content = content;
     }
+
 
 
 }

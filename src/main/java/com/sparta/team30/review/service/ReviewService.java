@@ -1,12 +1,14 @@
 package com.sparta.team30.review.service;
 
-import com.sparta.team30.common.exception.*;
+import com.sparta.team30.common.exception.OrderNotFoundException;
+import com.sparta.team30.common.exception.StoreNotFoundException;
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.review.domain.Review;
 import com.sparta.team30.review.dto.ReviewCreateRequestDto;
 import com.sparta.team30.review.dto.ReviewResponseDto;
 import com.sparta.team30.review.dto.ReviewUpdateRequestDto;
+import com.sparta.team30.review.exception.*;
 import com.sparta.team30.review.repository.ReviewRepository;
 import com.sparta.team30.store.domain.Store;
 import com.sparta.team30.store.repository.StoreRepository;
@@ -55,12 +57,19 @@ public class ReviewService {
     @Transactional
     public ReviewResponseDto addReview(ReviewCreateRequestDto requestDto, String username) {
         User user = findUserByUserId(username);
+        User targetUser = findUserByUserId(username);
+
+        // 본인 확인 (직접 작성하고 있는 계정과, 조회하려는 계정이 다른 경우)
+        if (!user.getUsername().equals(targetUser.getUsername())) {
+            throw new ReviewAccessDeniedException("본인만 조회할 수 있습니다.");
+        }
+
         Order order = findOrderById(requestDto.getOrderId());
         Store store = findStoreById(requestDto.getStoreId());
         validateReviewUniqueness(order);
 
         if (requestDto.getContent().length() > 255) {
-            throw new IllegalArgumentException("리뷰내용은 최대 255자까지 가능합니다.");
+            throw new InvalidReviewContentException("리뷰내용은 최대 255자까지 가능합니다.");
         }
 
         Review review = new Review(
@@ -86,41 +95,28 @@ public class ReviewService {
         //리뷰 존재 여부
         Review review = reviewRepository.findByReviewIdAndIsDeletedFalse(requestDto.getReviewId())
                 .orElseThrow(() -> new ReviewNotFoundException("리뷰를 찾을 수 없거나 이미 삭제된 리뷰입니다."));
+        if (!review.getUser().getUsername().equals(username)) {
+            throw new ReviewAccessDeniedException("본인만 수정할 수 있습니다.");
+        }
+
         if (requestDto.getScore() < 0 || requestDto.getScore() > 5) {
-            throw new IllegalArgumentException("유효한 점수 범위를 입력해주세요.");
+            throw new InvalidReviewScoreException("유효한 점수 범위를 입력해주세요.");
         }
         if (requestDto.getContent() == null || requestDto.getContent().length() > 255) {
-            throw new IllegalArgumentException("리뷰내용은 255자를 넘을 수 없습니다.");
+            throw new InvalidReviewContentException("리뷰내용은 255자를 넘을 수 없습니다.");
         }
         //유저확인
         // 사용자 역할 및 권한 확인
-        User user = review.getUser();
-        String userAuthority = user.getRole().getAuthority(); // UserRoleEnum에서 권한 가져오기
-
-        if (userAuthority.equals(UserRoleEnum.Authority.CUSTOMER)) {
-            // 사용자 본인 확인
-            if (!user.getUsername().equals(username)) {
-                throw new ReviewAccessDeniedException("권한이 없습니다.");
-            }
-
-            // 생성 후 3일 이내인지 확인
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime createdAt = review.getCreatedAt();
-            if (createdAt.isBefore(now.minusDays(3))) {
-                throw new ReviewTimeExpiredException("리뷰는 생성 후 3일 이내에만 수정할 수 있습니다.");
-            }
-
-        } else if (userAuthority.equals(UserRoleEnum.Authority.MASTER)) {
-            // MASTER는 시간 제한 없이 수정 가능
-                throw new ReviewAccessDeniedException("관리자만 리뷰를 수정할 수 있습니다.");
-        } else {
-            throw new ReviewAccessDeniedException("해당 작업은 USER 또는 MANAGER 역할만 수행할 수 있습니다.");
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime createdAt = review.getCreatedAt();
+        if (createdAt.isBefore(now.minusDays(3))) {
+            throw new ReviewTimeExpiredException("리뷰는 생성 후 3일 이내에만 수정할 수 있습니다.");
         }
+
+        int oldScore = review.getScore();
         review.updateReview(requestDto.getScore(), requestDto.getContent());
 
-        UUID storeId = review.getStoreId().getStoreId();
-        int score = review.getScore();
-        updateStoreRating(storeId, score, requestDto.getScore());
+        updateStoreRating(review.getStoreId().getStoreId(), oldScore, requestDto.getScore());
     }
 
 
@@ -140,7 +136,9 @@ public class ReviewService {
             if (!user.getUsername().equals(username)) {
                 throw new ReviewAccessDeniedException("본인의 리뷰만 삭제할 수 있습니다.");
             }
-        } else if (!userAuthority.equals(UserRoleEnum.Authority.MASTER)) {
+        } else if (userAuthority.equals(UserRoleEnum.Authority.MASTER)) {
+            // MASTER는 모든 리뷰 삭제 가능
+        } else {
             throw new ReviewAccessDeniedException("리뷰 삭제는 CUSTOMER 또는 MASTER 권한만 가능합니다.");
         }
 
@@ -176,7 +174,7 @@ public class ReviewService {
 
     private void validateReviewUniqueness(Order order) {
         if (reviewRepository.existsByOrderId(order)) {
-            throw new IllegalArgumentException("해당 주문에 대한 리뷰가 존재합니다.");
+            throw new DuplicateReviewException("해당 주문에 대한 리뷰가 존재합니다.");
         }
     }
     //리뷰 재계산

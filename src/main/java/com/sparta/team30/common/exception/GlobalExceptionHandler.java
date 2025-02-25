@@ -1,6 +1,9 @@
 package com.sparta.team30.common.exception;
 
-import com.sparta.team30.category.exception.*;
+import com.sparta.team30.category.exception.CategoryAlreadyDeleteException;
+import com.sparta.team30.category.exception.CategoryNotFoundException;
+import com.sparta.team30.category.exception.DuplicateCategoryException;
+import com.sparta.team30.review.exception.*;
 import com.sparta.team30.store.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -221,10 +224,42 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> reviewTimeExpiredException(ReviewTimeExpiredException e) {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
-                        .statusCode(HttpStatus.GONE.value())
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
                         .message(e.getMessage())
                         .build(),
-                HttpStatus.GONE
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(DuplicateReviewException.class)
+    public ResponseEntity<ErrorResponse> duplicateReviewException(DuplicateReviewException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(InvalidReviewContentException.class)
+    public ResponseEntity<ErrorResponse> invalidReviewContentException(InvalidReviewContentException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+    @ExceptionHandler(InvalidReviewScoreException.class)
+    public ResponseEntity<ErrorResponse> invalidReviewScoreException(InvalidReviewScoreException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.BAD_REQUEST
         );
     }
 

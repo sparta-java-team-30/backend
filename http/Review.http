@@ -1,23 +1,19 @@
 ### GET ALL REVIEWS BY STORE
 # 특정 가게의 모든 리뷰 조회
-GET http://localhost:8080/reviews/{storeId}/reviews
-Content-Type: application/json
-{
-  "storeId": "550e8400-e29b-41d4-a716-446655440002"
-}
+GET http://localhost:8080/reviews/{store-id}/reviews
+Accept: application/json
 
 ### GET REVIEW DETAIL
-# 개인 리뷰 조회 (userId 기준)
-GET http://localhost:8080/reviews/{userId}
-Content-Type: application/json
-{
-  "reviewId": "550e8400-e29b-41d4-a716-446655440002"
-}
+# 개인 리뷰 조회
+GET http://localhost:8080/reviews/my-reviews
+Authorization: Bearer <YOUR_ACCESS_TOKEN>
+Accept: application/json
 
 ### POST CREATE REVIEW
 # 새로운 리뷰 생성
 POST http://localhost:8080/reviews/create
 Content-Type: application/json
+Authorization: Bearer <YOUR_ACCESS_TOKEN>
 
 {
   "storeId": "550e8400-e29b-41d4-a716-446655440000",
@@ -28,19 +24,18 @@ Content-Type: application/json
 
 ### PUT UPDATE REVIEW
 # 특정 리뷰 수정
-PATCH http://localhost:8080/reviews/{reviewId}
+PATCH http://localhost:8080/reviews/{review-id}
 Content-Type: application/json
+Authorization: Bearer <YOUR_ACCESS_TOKEN>
 
 {
   "reviewId": "550e8400-e29b-41d4-a716-446655440002",
   "score": 1,
-  "content": "맜있어요."
+  "content": "배달이 느려요."
 }
 
 ### DELETE REVIEW
 # 특정 리뷰 소프트 삭제
-DELETE http://localhost:8080/reviews/{reviewId}
+DELETE http://localhost:8080/reviews/{review-id}
 Content-Type: application/json
-{
-  "reviewId": "550e8400-e29b-41d4-a716-446655440002",
-}
+Authorization: Bearer <YOUR_ACCESS_TOKEN>
