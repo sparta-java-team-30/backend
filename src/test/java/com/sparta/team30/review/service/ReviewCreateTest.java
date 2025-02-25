@@ -1,6 +1,7 @@
 package com.sparta.team30.review.service;
 
 import com.sparta.team30.category.domain.Category;
+import com.sparta.team30.category.dto.CategoryDto;
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.review.domain.Review;
@@ -50,16 +51,21 @@ public class ReviewCreateTest {
     private Review review;
     private UUID storeId;
     private UUID orderId;
+    private UUID categoryId;
 
     @BeforeEach
     void setUp() {
         storeId = UUID.randomUUID();
         orderId = UUID.randomUUID();
+        categoryId = UUID.randomUUID();
         Category category = new Category();
+        category.setCategoryId(categoryId);
+        category.setCategoryName("한식");
+        CategoryDto categoryDto = new CategoryDto(category);
         Order order = new Order();
         User user = new User("test1234@naver.com","test1234","test123!","test",false, UserRoleEnum.USER);
         StoreRequestDto requestDto = new StoreRequestDto(category.getCategoryId(), "한식당1", "0212341234", "01234", "서울시 중구", "1층");
-        Store store = new Store(category, requestDto);
+        Store store = new Store(categoryDto, requestDto,user);
 
 
         review = new Review(5, "맛있어요!", store, order, user);
