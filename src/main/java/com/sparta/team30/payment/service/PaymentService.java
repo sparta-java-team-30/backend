@@ -44,8 +44,8 @@ public class PaymentService {
             throw new OrderAccessDeniedException("잘못된 접근입니다.");
         }
         //이미 결제된 주문인지 확인
-        Optional<Payment> latestPayment = paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order);
-        if (latestPayment.isPresent() && latestPayment.get().getPaymentStatus().equals(PaymentTypeEnum.COMPLETED)) {
+        Optional<PaymentTypeEnum> paymentState = paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order.getOrderId());
+        if (paymentState.isPresent() && paymentState.get()==PaymentTypeEnum.COMPLETED) {
             throw new AlreadyPaidException("이미 결제된 주문입니다.");
         }
 
@@ -114,7 +114,5 @@ public class PaymentService {
         payment.deletePayment(user.getUsername(),PaymentTypeEnum.CANCELLED);
     }
 
-    public Optional<Payment> findFirstOrderByUpdatedAtDesc(Order order){
-        return paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order);
-    }
+
 }

@@ -63,8 +63,8 @@ class PaymentServiceTest {
         Payment payment =  mock(Payment.class);
         when(userDetails.getUsername()).thenReturn("user");
         when(orderService.getOrder(any())).thenReturn(order);
-        when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order)).thenReturn(Optional.of(payment));
-        when(payment.getPaymentStatus()).thenReturn(PaymentTypeEnum.PENDING);
+        when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order.getOrderId())).thenReturn(Optional.of(PaymentTypeEnum.PENDING));
+      //  when(payment.getPaymentStatus()).thenReturn(PaymentTypeEnum.PENDING);
         //when
         ResponseCreatePaymentDTO responseCreatePaymentDTO = paymentService.makePayment(userDetails, new RequestPaymentByOrderId(order.getOrderId(), "카드"));
         //then
@@ -83,8 +83,8 @@ class PaymentServiceTest {
         Payment payment =  mock(Payment.class);
         when(userDetails.getUsername()).thenReturn("user");
         when(orderService.getOrder(any())).thenReturn(order);
-        when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order)).thenReturn(Optional.of(payment));
-        when(payment.getPaymentStatus()).thenReturn(PaymentTypeEnum.COMPLETED);
+        when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order.getOrderId())).thenReturn(Optional.of(PaymentTypeEnum.COMPLETED));
+        //when(payment.getPaymentStatus()).thenReturn(PaymentTypeEnum.COMPLETED);
         //when-then
         assertThrows(AlreadyPaidException.class , () ->
                 paymentService.makePayment(userDetails, new RequestPaymentByOrderId(order.getOrderId(), "카드")));
