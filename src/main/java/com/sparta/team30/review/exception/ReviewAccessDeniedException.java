@@ -1,4 +1,4 @@
-package com.sparta.team30.common.exception;
+package com.sparta.team30.review.exception;
 
 public class ReviewAccessDeniedException extends RuntimeException {
     public ReviewAccessDeniedException(String message) {

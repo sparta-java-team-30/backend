@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +27,12 @@ import java.util.UUID;
 @Tag(name = "Review API", description = "리뷰 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/review")
+@RequestMapping("/api/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
     //리뷰등록
-
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
     @Operation(summary = "리뷰 생성", description = "새로운 리뷰를 생성합니다.")
     @ApiResponses(value = {
@@ -49,14 +50,14 @@ public class ReviewController {
     }
 
     //음식점 내 리뷰 조회
-    @GetMapping("/{storeId}/reviews")
+    @GetMapping("/{store-id}/reviews")
     @Operation(summary = "가게별 리뷰 목록 조회", description = "특정 가게의 리뷰를 페이징하여 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰 목록이 성공적으로 조회됨"),
             @ApiResponse(responseCode = "404", description = "가게를 찾을 수 없음")
     })
     public ResponseEntity<Page<ReviewResponseDto>> getAllReviewsByStore(
-            @PathVariable UUID storeId,
+            @PathVariable("store-id") UUID storeId,
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "페이지 크기", example = "10") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "정렬 기준 필드", example = "createdAt") @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -77,6 +78,7 @@ public class ReviewController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/my-reviews")
     @Operation(summary = "내 리뷰 목록 조회", description = "현재 로그인한 사용자의 리뷰 목록을 조회합니다.")
     @ApiResponses(value = {
@@ -92,7 +94,9 @@ public class ReviewController {
 
 
     //    //수정
-    @PatchMapping("/{reviewId}")
+
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @PatchMapping("/{review-id}")
     @Operation(summary = "리뷰 수정", description = "특정 리뷰를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리뷰가 성공적으로 수정됨"),
@@ -108,15 +112,15 @@ public class ReviewController {
 
 
     //소프트삭제
-
-    @DeleteMapping("/{reviewId}")
+    @PreAuthorize("hasAnyRole('CUSTOMER','MASTER')")
+    @DeleteMapping("/{review-id}")
     @Operation(summary = "리뷰 소프트 삭제", description = "특정 리뷰를 소프트 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "리뷰가 성공적으로 삭제됨"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "404", description = "리뷰를 찾을 수 없음")
     })
-    public ResponseEntity<String> deleteReview(@Parameter(description = "삭제할 리뷰의 ID") @PathVariable UUID reviewId,
+    public ResponseEntity<String> deleteReview(@Parameter(description = "삭제할 리뷰의 ID") @PathVariable("review-id") UUID reviewId,
                                                @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
         reviewService.deleteReview(reviewId, username);

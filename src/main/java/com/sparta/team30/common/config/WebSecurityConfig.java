@@ -44,6 +44,10 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/auth").hasRole("MANAGER")
                 .requestMatchers("/api/stores/**").permitAll()
                 .requestMatchers("/api/categories/**").permitAll()
+                .requestMatchers("/api/review/{storeId}/reviews").permitAll()
+                .requestMatchers("/api/review/create").authenticated()
+                .requestMatchers("/api/review/my-reviews").authenticated()
+                .requestMatchers("/api/review/{reviewId}").authenticated()
                 .anyRequest().authenticated()
         );
 

@@ -1,6 +1,11 @@
 package com.sparta.team30.common.exception;
 
-import com.sparta.team30.category.exception.*;
+import com.sparta.team30.category.exception.CategoryAlreadyDeleteException;
+import com.sparta.team30.category.exception.CategoryNotFoundException;
+import com.sparta.team30.category.exception.DuplicateCategoryException;
+import com.sparta.team30.review.exception.ReviewAccessDeniedException;
+import com.sparta.team30.review.exception.ReviewNotFoundException;
+import com.sparta.team30.review.exception.ReviewTimeExpiredException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
