@@ -16,7 +16,11 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
     public Optional<User> findByUsername(String username) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(user)
-                .where(user.username.eq(username))
+                .where(
+                        user.username.eq(username),
+                        user.deletedAt.isNull(),
+                        user.deletedBy.isNull()
+                )
                 .fetchOne());
     }
 
@@ -24,7 +28,11 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
     public Optional<User> findByEmail(String email) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(user)
-                .where(user.email.eq(email))
+                .where(
+                        user.email.eq(email),
+                        user.deletedAt.isNull(),
+                        user.deletedBy.isNull()
+                )
                 .fetchOne());
     }
 
@@ -48,7 +56,11 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
     public void updateCreatedBy(String createdBy, Long id) {
         queryFactory
                 .update(user)
-                .where(user.id.eq(id))
+                .where(
+                        user.id.eq(id),
+                        user.deletedAt.isNull(),
+                        user.deletedBy.isNull()
+                )
                 .set(user.createdBy, createdBy)
                 .execute();
     }
@@ -57,7 +69,11 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
     public Optional<User> findUserByUserId(String username) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(user)
-                .where(user.username.eq(username))
+                .where(
+                        user.username.eq(username),
+                        user.deletedAt.isNull(),
+                        user.deletedBy.isNull()
+                )
                 .fetchOne());
     }
 

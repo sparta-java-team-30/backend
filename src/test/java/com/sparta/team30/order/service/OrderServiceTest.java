@@ -11,7 +11,8 @@ import com.sparta.team30.order.dto.*;
 import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.payment.domain.Payment;
 import com.sparta.team30.payment.domain.PaymentTypeEnum;
-import com.sparta.team30.payment.repository.PaymentRepository;
+import com.sparta.team30.payment.service.PaymentOfOrderService;
+import com.sparta.team30.payment.service.PaymentService;
 import com.sparta.team30.products.domain.Product;
 import com.sparta.team30.products.repository.ProductRepository;
 import com.sparta.team30.user.domain.User;
@@ -57,7 +58,9 @@ class OrderServiceTest {
     private AddressRepository addressRepository;
 
     @Mock
-    private PaymentRepository paymentRepository;
+    private PaymentOfOrderService paymentofOrderService;
+
+
 
     @Nested
     @DisplayName("주문 생성 테스트")
@@ -257,7 +260,7 @@ class OrderServiceTest {
             when(orderRepository.findById(any(UUID.class))).thenReturn(Optional.of(mockOrder));
             when(mockOrder.getUser()).thenReturn(user);
             when(mockOrder.getUpdatedAt()).thenReturn(LocalDateTime.now());
-            when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(mockOrder)).thenReturn(Optional.of(payment));
+            when(paymentofOrderService.findFirstOrderByUpdatedAtDesc(mockOrder.getOrderId())).thenReturn(Optional.of(payment.getPaymentStatus()));
             RequestUpdateOrderDTO updateDTO = new RequestUpdateOrderDTO("요청사항 수정");
 
             //when-then
@@ -281,7 +284,7 @@ class OrderServiceTest {
             when(orderRepository.findById(any(UUID.class))).thenReturn(Optional.of(mockOrder));
             when(mockOrder.getUser()).thenReturn(user);
             when(mockOrder.getUpdatedAt()).thenReturn(LocalDateTime.now());
-            when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(mockOrder)).thenReturn(Optional.of(payment));
+            when(paymentofOrderService.findFirstOrderByUpdatedAtDesc(mockOrder.getOrderId())).thenReturn(Optional.of(payment.getPaymentStatus()));
             RequestUpdateOrderDTO updateDTO = new RequestUpdateOrderDTO("요청사항 수정");
 
             //when
@@ -309,7 +312,7 @@ class OrderServiceTest {
             when(orderRepository.findById(any(UUID.class))).thenReturn(Optional.of(mockOrder));
             when(mockOrder.getUser()).thenReturn(user);
             when(mockOrder.getUpdatedAt()).thenReturn(LocalDateTime.now());
-            when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(mockOrder)).thenReturn(Optional.of(payment));
+            when(paymentofOrderService.findFirstOrderByUpdatedAtDesc(mockOrder.getOrderId())).thenReturn(Optional.of(payment.getPaymentStatus()));
             RequestUpdateOrderDTO updateDTO = new RequestUpdateOrderDTO("요청사항 수정");
 
             //when

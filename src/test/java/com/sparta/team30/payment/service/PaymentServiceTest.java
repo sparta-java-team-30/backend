@@ -6,7 +6,7 @@ import com.sparta.team30.common.exception.AlreadyPaidException;
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.domain.OrderTypeEnum;
 import com.sparta.team30.order.dto.RequestCreateOrderDTO;
-import com.sparta.team30.order.repository.OrderRepository;
+import com.sparta.team30.order.service.OrderService;
 import com.sparta.team30.payment.domain.Payment;
 import com.sparta.team30.payment.domain.PaymentTypeEnum;
 import com.sparta.team30.payment.dto.RequestPaymentByOrderId;
@@ -45,7 +45,7 @@ class PaymentServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private OrderRepository orderRepository;
+    private OrderService orderService;
 
     @Mock
     private PaymentRepository paymentRepository;
@@ -62,9 +62,9 @@ class PaymentServiceTest {
         Order order = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY,1000,user,address);
         Payment payment =  mock(Payment.class);
         when(userDetails.getUsername()).thenReturn("user");
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
-        when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order)).thenReturn(Optional.of(payment));
-        when(payment.getPaymentStatus()).thenReturn(PaymentTypeEnum.PENDING);
+        when(orderService.getOrder(any())).thenReturn(order);
+        when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order.getOrderId())).thenReturn(Optional.of(PaymentTypeEnum.PENDING));
+      //  when(payment.getPaymentStatus()).thenReturn(PaymentTypeEnum.PENDING);
         //when
         ResponseCreatePaymentDTO responseCreatePaymentDTO = paymentService.makePayment(userDetails, new RequestPaymentByOrderId(order.getOrderId(), "카드"));
         //then
@@ -82,9 +82,9 @@ class PaymentServiceTest {
         Order order = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY,1000,user,address);
         Payment payment =  mock(Payment.class);
         when(userDetails.getUsername()).thenReturn("user");
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
-        when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order)).thenReturn(Optional.of(payment));
-        when(payment.getPaymentStatus()).thenReturn(PaymentTypeEnum.COMPLETED);
+        when(orderService.getOrder(any())).thenReturn(order);
+        when(paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order.getOrderId())).thenReturn(Optional.of(PaymentTypeEnum.COMPLETED));
+        //when(payment.getPaymentStatus()).thenReturn(PaymentTypeEnum.COMPLETED);
         //when-then
         assertThrows(AlreadyPaidException.class , () ->
                 paymentService.makePayment(userDetails, new RequestPaymentByOrderId(order.getOrderId(), "카드")));
@@ -105,7 +105,7 @@ class PaymentServiceTest {
             Payment payment2 = mock(Payment.class);
             List<Payment> mockList = List.of(payment1,payment2);
             when(userDetails.getUsername()).thenReturn("user");
-            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+            when(orderService.getOrder(any())).thenReturn(order);
             when( userRepository.findByUsername(userDetails.getUsername())).thenReturn(Optional.ofNullable(user));
             when(paymentRepository.findAllByOrderAndIsDeletedFalseOrderByUpdatedAtDesc(order)).thenReturn(mockList);
 
@@ -125,7 +125,7 @@ class PaymentServiceTest {
             Order order = new Order(requestCreateOrderDTO, OrderTypeEnum.DELIVERY,1000,user,address);
             Payment payment =  mock(Payment.class);
             when(userDetails.getUsername()).thenReturn("user");
-            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+            when(orderService.getOrder(any())).thenReturn(order);
             when( userRepository.findByUsername(userDetails.getUsername())).thenReturn(Optional.ofNullable(user));
             when(paymentRepository.findById(payment.getPaymentId())).thenReturn(Optional.of(payment));
             when(payment.getCreatedBy()).thenReturn("user");
