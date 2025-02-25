@@ -2,6 +2,7 @@ package com.sparta.team30.order.service;
 
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.domain.OrderDetail;
+import com.sparta.team30.order.dto.ResponseMyStoreOrderListDTO;
 import com.sparta.team30.order.dto.ResponseOrderProductDTO;
 import com.sparta.team30.order.repository.OrderDetailRepository;
 import com.sparta.team30.products.domain.Product;
@@ -33,5 +34,9 @@ public class OrderDetailService {
 
     public String getStoreName(UUID orderId) {
         return orderDetailRepository.findStoreNameByOrderId(orderId);
+    }
+
+    public List<ResponseMyStoreOrderListDTO> getMyStoreOrderList(UUID storeId) {
+        return orderDetailRepository.getMyStoreOrderList(storeId);
     }
 }
