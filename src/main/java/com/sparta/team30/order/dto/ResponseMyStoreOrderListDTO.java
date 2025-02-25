@@ -1,6 +1,7 @@
 package com.sparta.team30.order.dto;
 
 import com.sparta.team30.order.domain.OrderTypeEnum;
+import com.sparta.team30.payment.dto.PaymentDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -19,4 +20,5 @@ public class ResponseMyStoreOrderListDTO {
     private List<ResponseOrderProductDTO> OrderProductDTOList;
     private String deliveryAddress;
     private String userName;
+    private List<PaymentDTO> payment;
 }

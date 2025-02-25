@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class StoreRequestDto {
 
-    @Schema(description = "음식점 카테고리", example = "한식")
+    @Schema(description = "음식점 카테고리", example = "e2eea1ab-463e-42e7-82d5-0da14235fe5a")
     @NotNull(message = "카테고리는 필수입니다.")
     private UUID categoryId;
 

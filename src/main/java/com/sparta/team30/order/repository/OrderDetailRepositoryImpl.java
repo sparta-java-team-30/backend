@@ -9,6 +9,9 @@ import com.sparta.team30.order.domain.QOrder;
 import com.sparta.team30.order.domain.QOrderDetail;
 import com.sparta.team30.order.dto.ResponseMyStoreOrderListDTO;
 import com.sparta.team30.order.dto.ResponseOrderProductDTO;
+import com.sparta.team30.payment.domain.Payment;
+import com.sparta.team30.payment.domain.QPayment;
+import com.sparta.team30.payment.dto.PaymentDTO;
 import com.sparta.team30.products.domain.QProduct;
 import com.sparta.team30.store.domain.QStore;
 import com.sparta.team30.user.domain.QUser;
@@ -67,6 +70,7 @@ public class OrderDetailRepositoryImpl implements OrderDetailRepositoryCustom {
         QOrder order = QOrder.order;
         QUser user = QUser.user;
         QAddress address = QAddress.address;
+        QPayment payment = QPayment.payment;
 
         List<OrderDetail> orderDetailList = queryFactory
                 .selectFrom(orderDetail)
@@ -74,13 +78,31 @@ public class OrderDetailRepositoryImpl implements OrderDetailRepositoryCustom {
                 .join(orderDetail.order, order)
                 .join(order.user, user)
                 .join(order.address, address)
+                .leftJoin(order.payment, payment)
                 .where(product.store.storeId.eq(storeId))
                 .fetch();
+
+        for(OrderDetail o : orderDetailList) {
+            System.out.println(o.getOrder().getOrderId());
+        }
 
         List<ResponseMyStoreOrderListDTO> myStoreOrderList = new ArrayList<>();
 
         for(OrderDetail orderDetail1 : orderDetailList) {
             Order order1 = orderDetail1.getOrder();
+
+            List<Payment> paymentList = order1.getPayment();
+            List<PaymentDTO> paymentDTOList = new ArrayList<>();
+            for(Payment p : paymentList) {
+                paymentDTOList.add(new PaymentDTO(
+                        p.getPaymentId(),
+                        p.getPaymentPrice(),
+                        p.getPaymentType(),
+                        p.getPaymentCount(),
+                        p.getPaymentStatus()
+                        )
+                );
+            }
 
             List<ResponseOrderProductDTO> orderProductDTOList = new ArrayList<>();
             for(OrderDetail orderDetail2 : order1.getOrderDetails()) {
@@ -102,7 +124,8 @@ public class OrderDetailRepositoryImpl implements OrderDetailRepositoryCustom {
                     order1.getAddress().getUserPostcode() +
                             order1.getAddress().getUserAddress1() +
                             order1.getAddress().getUserAddress2(),
-                    order1.getUser().getUsername()
+                    order1.getUser().getUsername(),
+                    paymentDTOList
             );
 
             myStoreOrderList.add(MyStoreOrderListDTO);
