@@ -16,6 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.sparta.team30.user.domain.UserRoleEnum.MANAGER;
+import static com.sparta.team30.user.domain.UserRoleEnum.MASTER;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -92,12 +95,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("해당 username을 찾을 수 없습니다."));
 
-        if (UserRoleEnum.OWNER.equals(user.getRole()) ||
-                UserRoleEnum.MANAGER.equals(user.getRole()) ||
-                UserRoleEnum.MASTER.equals(user.getRole())) {
-            throw new IllegalArgumentException("잘못된 요청입니다.");
-        }
-
         user.updateRoleOwner(request.getBusinessNumber());
     }
 
@@ -123,7 +120,7 @@ public class UserServiceImpl implements UserService {
         if (isCorrectSecretCode(request.getSecretCode(), MANAGER_SECRET_CODE)) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
-        user.updateRole(UserRoleEnum.MANAGER);
+        user.updateRole(MANAGER);
     }
 
     @Transactional
@@ -134,7 +131,7 @@ public class UserServiceImpl implements UserService {
         if (isCorrectSecretCode(request.getSecretCode(), MASTER_SECRET_CODE)) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
-        user.updateRole(UserRoleEnum.MASTER);
+        user.updateRole(MASTER);
     }
 
     private boolean isCorrectSecretCode(String secretCode, String SECRET_CODE) {

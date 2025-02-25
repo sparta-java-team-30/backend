@@ -7,6 +7,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
+import static com.sparta.team30.user.domain.UserRoleEnum.*;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -53,6 +57,10 @@ public class User extends BaseEntity {
     }
 
     public void updateRoleOwner(String businessNumber){
+        if (!Set.of(OWNER, MANAGER, MASTER).contains(role)) {
+            throw new IllegalArgumentException("잘못된 요청입니다.");
+        }
+
         this.businessNumber = businessNumber;
         this.role = UserRoleEnum.OWNER;
     }
