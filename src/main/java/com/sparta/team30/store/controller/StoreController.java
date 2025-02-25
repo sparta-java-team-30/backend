@@ -83,7 +83,7 @@ public class StoreController {
     }
 
     @Operation(summary = "내 음식점 주문 목록", description = "내 음식점 주문 목록을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "내 음식점 주문 목록 조회 성공"),
+    @ApiResponse(responseCode = "200", description = "내 음식점 주문 목록 조회 성공")
     @GetMapping("/stores/my/order")
 //    @PreAuthorize("@storeService.isOwner(#storeId, authentication.getPrincipal())")
     public ResponseEntity<List<ResponseMyStoreOrderListDTO>> getMyStoreOrderList(
@@ -91,7 +91,6 @@ public class StoreController {
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         StoreResponseDto response = storeService.getMyStore(userDetails.getUser());
-
         List<ResponseMyStoreOrderListDTO> myOrderList = orderDetailService.getMyStoreOrderList(response.getStoreId());
         return ResponseEntity.ok(myOrderList);
     }
