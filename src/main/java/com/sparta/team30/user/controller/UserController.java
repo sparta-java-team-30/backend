@@ -49,6 +49,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "user info", description = "회원 정보 조회 API")
+    @ApiResponse(responseCode = "200", description = "정보 조회 성공")
+    @ApiResponse(responseCode = "401", description = "올바른 회원 정보가 아님")
     @PatchMapping
     public ResponseEntity<Void> updateUserInfo (@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                 @RequestBody @Valid UserInfoUpdateRequestDto userInfoUpdateRequestDto) {
@@ -56,6 +59,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "user info", description = "회원 정보 조회 API")
+    @ApiResponse(responseCode = "200", description = "정보 조회 성공")
+    @ApiResponse(responseCode = "401", description = "올바른 회원 정보가 아님")
     @DeleteMapping
     public ResponseEntity<Void> deleteUser (@AuthenticationPrincipal UserDetailsImpl userDetails,
                                             @RequestBody UserDeleteRequestDto userDeleteRequestDto) {
@@ -63,6 +69,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Operation(summary = "user info", description = "회원 정보 조회 API")
+    @ApiResponse(responseCode = "200", description = "정보 조회 성공")
+    @ApiResponse(responseCode = "401", description = "올바른 회원 정보가 아님")
     @PatchMapping("/roles/owner")
     public ResponseEntity<Void> updateUserToOwner (@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                  @RequestBody @Valid UserRoleUpdateOwnerRequest request) {
@@ -71,6 +80,9 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "user info", description = "회원 정보 조회 API")
+    @ApiResponse(responseCode = "200", description = "정보 조회 성공")
+    @ApiResponse(responseCode = "401", description = "올바른 회원 정보가 아님")
     @PatchMapping("/roles/manager")
     public ResponseEntity<Void> updateUserToMaster (@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                    @RequestBody @Valid UserRoleUpdateManagerRequest request) {
@@ -79,6 +91,10 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "user role update to manager", description = "회원 권한 Manager 변경 API")
+    @ApiResponse(responseCode = "200", description = "권한 변경 성공")
+    @ApiResponse(responseCode = "401", description = "올바른 회원 정보가 아님")
+    @ApiResponse(responseCode = "401", description = "올바른 회원 정보가 아님")
     @PatchMapping("/roles/master")
     public ResponseEntity<Void> updateUserToManager (@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                    @RequestBody @Valid UserRoleUpdateMasterRequest request) {

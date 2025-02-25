@@ -3,6 +3,7 @@ package com.sparta.team30.user.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -16,4 +17,11 @@ public class UserInfoUpdateRequestDto {
     private String nickname;
 
     private Boolean isPublic;
+
+    @Builder
+    public UserInfoUpdateRequestDto(String email, String nickname, Boolean isPublic) {
+        this.email = email;
+        this.nickname = nickname;
+        this.isPublic = isPublic;
+    }
 }
