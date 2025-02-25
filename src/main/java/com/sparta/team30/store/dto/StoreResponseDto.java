@@ -1,6 +1,7 @@
 package com.sparta.team30.store.dto;
 
 import com.sparta.team30.store.domain.Store;
+import com.sparta.team30.user.dto.UserDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.UUID;
 public class StoreResponseDto {
     private UUID storeId;
     private UUID categoryId;
+    private UserDto owner;
     private String storeName;
     private String storePhone;
     private String storePostcode;
@@ -33,6 +35,9 @@ public class StoreResponseDto {
     public StoreResponseDto(Store store) {
         this.storeId = store.getStoreId();
         this.categoryId = store.getCategory().getCategoryId();
+        if (store.getOwner() != null) {
+            this.owner = new UserDto(store.getOwner());
+        }
         this.storeName = store.getStoreName();
         this.storePhone = store.getStorePhone();
         this.storePostcode = store.getStorePostcode();

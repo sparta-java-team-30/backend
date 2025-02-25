@@ -1,6 +1,7 @@
 package com.sparta.team30.order.repository;
 
 
+import com.sparta.team30.order.dto.ResponseMyStoreOrderListDTO;
 import com.sparta.team30.order.dto.ResponseOrderProductDTO;
 
 import java.util.List;
@@ -11,4 +12,6 @@ public interface OrderDetailRepositoryCustom {
     List<ResponseOrderProductDTO> findByOrderId(UUID orderId);
 
     String findStoreNameByOrderId(UUID orderId);
+
+    List<ResponseMyStoreOrderListDTO> getMyStoreOrderList(UUID storeId);
 }

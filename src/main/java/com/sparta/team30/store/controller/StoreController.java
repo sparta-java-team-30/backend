@@ -1,6 +1,8 @@
 package com.sparta.team30.store.controller;
 
 import com.sparta.team30.common.security.UserDetailsImpl;
+import com.sparta.team30.order.dto.ResponseMyStoreOrderListDTO;
+import com.sparta.team30.order.service.OrderDetailService;
 import com.sparta.team30.store.dto.*;
 import com.sparta.team30.store.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Store API", description = "음식점 관련 API")
@@ -27,6 +30,8 @@ import java.util.UUID;
 public class StoreController {
 
     private final StoreService storeService;
+    // 주문 목록
+    private final OrderDetailService orderDetailService;
 
     @Operation(summary = "음식점 조회", description = "음식점 전체 조회, 음식점 이름으로 조회, 음식점 카테고리별 조회합니다.")
     @ApiResponse(responseCode = "200", description = "음식점 조회 성공")
@@ -75,6 +80,26 @@ public class StoreController {
     ) {
         StoreResponseDto response = storeService.getMyStore(userDetails.getUser());
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "내 음식점 주문 목록", description = "내 음식점 주문 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "내 음식점 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "음식점을 찾을 수 없음")
+    })
+    @GetMapping("/stores/my/order")
+//    @PreAuthorize("@storeService.isOwner(#storeId, authentication.getPrincipal())")
+    public ResponseEntity<List<ResponseMyStoreOrderListDTO>> getMyStoreOrderList(
+            @Parameter(description = "지금 로그인 중인 유저")
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        StoreResponseDto response = storeService.getMyStore(userDetails.getUser());
+
+        List<ResponseMyStoreOrderListDTO> myOrderList = orderDetailService.getMyStoreOrderList(response.getStoreId());
+
+//        return storeService.getStores(page-1, limit, sortBy, order, search, categoryId);
+//        StoreResponseDto response = storeService.getMyStore(userDetails.getUser());
+        return ResponseEntity.ok(myOrderList);
     }
 
     @Operation(summary = "승인되지 않은 음식점 조회", description = "음식점 등록 후 아직 승인되지 않은 음식점을 조회합니다.")
