@@ -17,7 +17,7 @@ import java.util.UUID;
 public class ProductDetailHistory extends BaseEntity {
     @Id
     @UuidGenerator
-    @Column(columnDefinition = "BINARY(16)",name = "product_detail_history_id", updatable = false, nullable = false)
+    @Column(name = "product_detail_history_id", updatable = false, nullable = false)
     private UUID productDetailHistoryId;
 
     @Column(nullable = false)

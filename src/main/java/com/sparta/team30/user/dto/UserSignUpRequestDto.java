@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -32,4 +33,12 @@ public class UserSignUpRequestDto {
     @Size(min = 4, max = 20)
     @Schema(description = "사용자 nickname", defaultValue = "myuser")
     String nickname;
+
+    @Builder
+    public UserSignUpRequestDto(String username, String email, String password, String nickname) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+    }
 }

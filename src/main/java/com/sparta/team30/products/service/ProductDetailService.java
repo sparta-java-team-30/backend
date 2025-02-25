@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface ProductDetailService {
     ProductDetailResponseDto getProductDetail(UUID productId);
     ProductDetailResponseDto createProductDetail(UserDetails userDetails, UUID productId , ProductDetailRequestDto productDetailRequestDto);
+    void deleteProductDetail(UserDetails userDetails, UUID productId);
+    void updateProductDetail(UUID productId, ProductDetailRequestDto productDetailRequestDto);
 }

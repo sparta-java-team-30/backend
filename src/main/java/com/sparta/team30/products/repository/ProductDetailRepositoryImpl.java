@@ -11,7 +11,6 @@ import java.util.UUID;
 public class ProductDetailRepositoryImpl implements ProductDetailRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
-
     @Override
     public ProductDetail findByProductId(UUID productId) {
         return jpaQueryFactory
