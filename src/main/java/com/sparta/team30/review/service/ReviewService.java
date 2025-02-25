@@ -8,9 +8,7 @@ import com.sparta.team30.review.domain.Review;
 import com.sparta.team30.review.dto.ReviewCreateRequestDto;
 import com.sparta.team30.review.dto.ReviewResponseDto;
 import com.sparta.team30.review.dto.ReviewUpdateRequestDto;
-import com.sparta.team30.review.exception.ReviewAccessDeniedException;
-import com.sparta.team30.review.exception.ReviewNotFoundException;
-import com.sparta.team30.review.exception.ReviewTimeExpiredException;
+import com.sparta.team30.review.exception.*;
 import com.sparta.team30.review.repository.ReviewRepository;
 import com.sparta.team30.store.domain.Store;
 import com.sparta.team30.store.repository.StoreRepository;
@@ -71,7 +69,7 @@ public class ReviewService {
         validateReviewUniqueness(order);
 
         if (requestDto.getContent().length() > 255) {
-            throw new IllegalArgumentException("리뷰내용은 최대 255자까지 가능합니다.");
+            throw new InvalidReviewContentException("리뷰내용은 최대 255자까지 가능합니다.");
         }
 
         Review review = new Review(
@@ -102,10 +100,10 @@ public class ReviewService {
         }
 
         if (requestDto.getScore() < 0 || requestDto.getScore() > 5) {
-            throw new IllegalArgumentException("유효한 점수 범위를 입력해주세요.");
+            throw new InvalidReviewScoreException("유효한 점수 범위를 입력해주세요.");
         }
         if (requestDto.getContent() == null || requestDto.getContent().length() > 255) {
-            throw new IllegalArgumentException("리뷰내용은 255자를 넘을 수 없습니다.");
+            throw new InvalidReviewContentException("리뷰내용은 255자를 넘을 수 없습니다.");
         }
         //유저확인
         // 사용자 역할 및 권한 확인
@@ -176,7 +174,7 @@ public class ReviewService {
 
     private void validateReviewUniqueness(Order order) {
         if (reviewRepository.existsByOrderId(order)) {
-            throw new IllegalArgumentException("해당 주문에 대한 리뷰가 존재합니다.");
+            throw new DuplicateReviewException("해당 주문에 대한 리뷰가 존재합니다.");
         }
     }
     //리뷰 재계산
