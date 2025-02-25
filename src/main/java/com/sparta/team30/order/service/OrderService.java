@@ -112,7 +112,7 @@ public class OrderService {
     public ResponseOrderDetailsDTO getOrderDetails(UserDetails userDetails, UUID orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
 
-        if(order.getUser().getRole().equals(UserRoleEnum.USER) && !order.getUser().getUsername().equals(userDetails.getUsername())){
+        if(order.getUser().getRole()==UserRoleEnum.USER && !order.getUser().getUsername().equals(userDetails.getUsername())){
             throw new OrderAccessDeniedException("권한이 없습니다.");
         }
         List<ResponseOrderProductDTO> orderProductList = orderDetailService.getOrderProductList(orderId);
@@ -145,13 +145,13 @@ public class OrderService {
     private void checkAutority(UserDetails userDetails, Order order) {
 
         //사용자일 경우에만 체크
-        if(order.getUser().getRole().equals(UserRoleEnum.USER)) {
+        if(order.getUser().getRole()==UserRoleEnum.USER) {
 
             if (!order.getUser().getUsername().equals(userDetails.getUsername())) {
                 throw new OrderAccessDeniedException("권한이 없습니다.");
             }
 
-            if (order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)) && order.getUser().getRole().equals(UserRoleEnum.USER)) //사용자는 5분 이내
+            if (order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)) && order.getUser().getRole()==UserRoleEnum.USER) //사용자는 5분 이내
             {
                 throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(5분 초과)");
             }

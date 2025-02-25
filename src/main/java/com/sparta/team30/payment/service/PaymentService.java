@@ -74,7 +74,7 @@ public class PaymentService {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
 
         //사용자는 본인 주문만 결제내역 조회 가능
-        if (user.getRole().equals(UserRoleEnum.USER) && !order.getUser().getUsername().equals(userDetails.getUsername())) {
+        if (user.getRole()==UserRoleEnum.USER && !order.getUser().getUsername().equals(userDetails.getUsername())) {
             throw new OrderAccessDeniedException("잘못된 접근입니다.");
         }
 
@@ -89,7 +89,7 @@ public class PaymentService {
 
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new PaymentNotFoundException("존재하지 않는 결제내역입니다."));
-        if (user.getRole().equals(UserRoleEnum.USER) && !payment.getCreatedBy().equals(user.getUsername())) {
+        if (user.getRole()==UserRoleEnum.USER && !payment.getCreatedBy().equals(user.getUsername())) {
             throw new IllegalArgumentException("잘못된 접근입니다.");
         }
 
@@ -101,7 +101,7 @@ public class PaymentService {
     public void deletePayment(UserDetails userDetails, UUID paymentId) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
 
-        if(user.getRole().equals(UserRoleEnum.USER)){
+        if(user.getRole()==UserRoleEnum.USER){
             throw new IllegalArgumentException("잘못된 접근입니다.");
         }
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new PaymentNotFoundException("존재하지 않는 결제내역입니다."));
