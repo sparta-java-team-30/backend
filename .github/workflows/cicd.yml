@@ -48,7 +48,7 @@ jobs:
           username: ${{ secrets.SSH_HOST_NAME }}
           key: ${{ secrets.SSH_SECRET_KEY }}
           script: |
-            sudo docker stop $(docker ps -a -q)
-            sudo docker rm $(docker ps -a -q)
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}
-            sudo docker run -d -p 8080:8080 --name ${{ secrets.CONTAINER_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}
+            sudo docker stop $(sudo docker ps -a -q) || true
+            sudo docker rm $(sudo docker ps -a -q) || true
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
+            sudo docker run -d -p 8080:8080 --name ${{ secrets.CONTAINER_NAME }} ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
