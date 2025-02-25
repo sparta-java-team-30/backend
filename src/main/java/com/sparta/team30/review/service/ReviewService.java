@@ -81,7 +81,7 @@ public class ReviewService {
         );
 
         // 음식점 리뷰 최초 등록 시 누적평균 평점 초기화
-        // 이후 리뷰가 추가될 경우 누적평균을 업데이트 함.
+        // 이후 리뷰가 추가될 경우 누적평균을 업데이트
         store.addReviewScore(requestDto.getScore());
 
         Review savedReview = reviewRepository.save(review);
