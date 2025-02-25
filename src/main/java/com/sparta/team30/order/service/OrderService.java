@@ -13,6 +13,7 @@ import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.payment.domain.Payment;
 import com.sparta.team30.payment.domain.PaymentTypeEnum;
 import com.sparta.team30.payment.repository.PaymentRepository;
+import com.sparta.team30.payment.service.PaymentService;
 import com.sparta.team30.products.domain.Product;
 import com.sparta.team30.products.repository.ProductRepository;
 import com.sparta.team30.user.domain.User;
@@ -41,7 +42,7 @@ public class OrderService {
     private final OrderDetailService orderDetailService;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-    private final PaymentRepository paymentRepository;
+    private final PaymentService paymentService;
     @Transactional
     public ResponseCreateOrderDTO addOrder(String username,
                                 RequestCreateOrderDTO requestCreateOrderDTO) {
@@ -157,12 +158,15 @@ public class OrderService {
         }
         //MASTER 제외 결제된 주문은 수정 불가
         if (!order.getUser().getRole().equals(UserRoleEnum.MASTER)) {
-            Optional<Payment> findPayment = paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order);
+            Optional<Payment> findPayment = paymentService.findFirstOrderByUpdatedAtDesc(order);
             if (findPayment.isPresent() && findPayment.get().getPaymentStatus().equals(PaymentTypeEnum.COMPLETED)) {
                 throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(결제 완료)");
             }
         }
     }
 
+    public Order getOrder(UUID orderId) {
+        return orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("존재하지 않는 주문입니다."));
+    }
 
 }

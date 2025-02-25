@@ -6,6 +6,7 @@ import com.sparta.team30.common.exception.OrderNotFoundException;
 import com.sparta.team30.common.exception.PaymentNotFoundException;
 import com.sparta.team30.order.domain.Order;
 import com.sparta.team30.order.repository.OrderRepository;
+import com.sparta.team30.order.service.OrderService;
 import com.sparta.team30.payment.domain.Payment;
 import com.sparta.team30.payment.domain.PaymentTypeEnum;
 import com.sparta.team30.payment.dto.*;
@@ -30,13 +31,13 @@ import java.util.stream.Collectors;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final OrderService orderService;
 
     @Transactional
     public ResponseCreatePaymentDTO makePayment(UserDetails userDetails, RequestPaymentByOrderId requestPaymentByOrderId) {
 
-        Order order = orderRepository.findById(requestPaymentByOrderId.getOrderId()).orElseThrow(() -> new OrderNotFoundException("존재하지 않는 주문입니다."));
+        Order order = orderService.getOrder(requestPaymentByOrderId.getOrderId());
 
         //본인 생성 주문만 결제 접근 가능
         if(!order.getUser().getUsername().equals(userDetails.getUsername())) {
@@ -69,7 +70,7 @@ public class PaymentService {
     //하나 주문에 대한 결제 내역 조회
     public List<ResponsePaymentHistoryDTO> getPaymentHistory(UserDetails userDetails, UUID orderId) {
 
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("존재하지 않는 주문입니다."));
+        Order order = orderService.getOrder(orderId);
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
 
         //사용자는 본인 주문만 결제내역 조회 가능
@@ -111,5 +112,9 @@ public class PaymentService {
 
 
         payment.deletePayment(user.getUsername(),PaymentTypeEnum.CANCELLED);
+    }
+
+    public Optional<Payment> findFirstOrderByUpdatedAtDesc(Order order){
+        return paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order);
     }
 }
