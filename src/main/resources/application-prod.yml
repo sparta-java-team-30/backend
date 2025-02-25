@@ -1,0 +1,39 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  config:
+    import: optional:file:.env[.properties]
+    activate:
+      on-profile: ${SPRING_PROFILE}
+  application:
+    name: team30
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+  paths-to-match:
+    - /api/**
+jwt:
+  issuer: ${JWT_ISSUER}
+  secretKey: ${JWT_SECRET_KEY}
+
+gemini:
+  uri: ${GEMINI_URI}
+  key: ${GEMINI_SECRET_KEY}
+
+secret:
+  code:
+    manager: ${MANAGER_SECRET_CODE}
+    master: ${MASTER_SECRET_CODE}
