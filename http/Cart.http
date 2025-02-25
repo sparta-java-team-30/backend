@@ -1,0 +1,24 @@
+### GET CART ITEMS
+# 사용자 장바구니 아이템 목록 조회
+GET http://localhost:8080/api/carts/{userId}?page=1&size=10&sortBy=productName&isAsc=true
+Content-Type: application/json
+
+### ADD ITEM TO CART
+# 장바구니에 상품 추가
+POST http://localhost:8080/api/carts/{userId}/items
+Content-Type: application/json
+
+{
+  "productId": "550e8400-e29b-41d4-a716-446655440001",
+  "quantity": 2
+}
+
+### UPDATE CART ITEM
+# 장바구니에서 특정 아이템의 수량 수정
+PATCH http://localhost:8080/api/carts/{userId}/items/{cartItemId}?count=3
+Content-Type: application/json
+
+### DELETE CART ITEM
+# 장바구니에서 특정 아이템 삭제
+DELETE http://localhost:8080/api/carts/{userId}/items/{cartItemId}
+Content-Type: application/json
