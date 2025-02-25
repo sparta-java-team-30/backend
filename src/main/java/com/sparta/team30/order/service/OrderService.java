@@ -12,7 +12,8 @@ import com.sparta.team30.order.dto.*;
 import com.sparta.team30.order.repository.OrderRepository;
 import com.sparta.team30.payment.domain.Payment;
 import com.sparta.team30.payment.domain.PaymentTypeEnum;
-import com.sparta.team30.payment.repository.PaymentRepository;
+import com.sparta.team30.payment.service.PaymentOfOrderService;
+import com.sparta.team30.payment.service.PaymentService;
 import com.sparta.team30.products.domain.Product;
 import com.sparta.team30.products.repository.ProductRepository;
 import com.sparta.team30.user.domain.User;
@@ -41,7 +42,7 @@ public class OrderService {
     private final OrderDetailService orderDetailService;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-    private final PaymentRepository paymentRepository;
+    private final PaymentOfOrderService paymentOfOrderService;
     @Transactional
     public ResponseCreateOrderDTO addOrder(String username,
                                 RequestCreateOrderDTO requestCreateOrderDTO) {
@@ -111,7 +112,7 @@ public class OrderService {
     public ResponseOrderDetailsDTO getOrderDetails(UserDetails userDetails, UUID orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
 
-        if(order.getUser().getRole().equals(UserRoleEnum.USER) && !order.getUser().getUsername().equals(userDetails.getUsername())){
+        if(order.getUser().getRole()==UserRoleEnum.USER && !order.getUser().getUsername().equals(userDetails.getUsername())){
             throw new OrderAccessDeniedException("권한이 없습니다.");
         }
         List<ResponseOrderProductDTO> orderProductList = orderDetailService.getOrderProductList(orderId);
@@ -144,25 +145,28 @@ public class OrderService {
     private void checkAutority(UserDetails userDetails, Order order) {
 
         //사용자일 경우에만 체크
-        if(order.getUser().getRole().equals(UserRoleEnum.USER)) {
+        if(order.getUser().getRole()==UserRoleEnum.USER) {
 
             if (!order.getUser().getUsername().equals(userDetails.getUsername())) {
                 throw new OrderAccessDeniedException("권한이 없습니다.");
             }
 
-            if (order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)) && order.getUser().getRole().equals(UserRoleEnum.USER)) //사용자는 5분 이내
+            if (order.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)) && order.getUser().getRole()==UserRoleEnum.USER) //사용자는 5분 이내
             {
                 throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(5분 초과)");
             }
         }
         //MASTER 제외 결제된 주문은 수정 불가
-        if (!order.getUser().getRole().equals(UserRoleEnum.MASTER)) {
-            Optional<Payment> findPayment = paymentRepository.findFirstByOrderOrderByUpdatedAtDesc(order);
-            if (findPayment.isPresent() && findPayment.get().getPaymentStatus().equals(PaymentTypeEnum.COMPLETED)) {
+        if (order.getUser().getRole()!=UserRoleEnum.MASTER) {
+            Optional<PaymentTypeEnum> paymentState = paymentOfOrderService.findFirstOrderByUpdatedAtDesc(order.getOrderId());
+            if (paymentState.isPresent() && paymentState.get()==PaymentTypeEnum.COMPLETED) {
                 throw new OrderAlreadyProcessedException("이미 접수된 주문입니다.(결제 완료)");
             }
         }
     }
 
+    public Order getOrder(UUID orderId) {
+        return orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("존재하지 않는 주문입니다."));
+    }
 
 }
