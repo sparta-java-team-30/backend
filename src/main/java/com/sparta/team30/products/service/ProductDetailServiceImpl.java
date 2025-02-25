@@ -39,7 +39,7 @@ public class ProductDetailServiceImpl implements ProductDetailService {
         ProductDetail productDetail = productDetailRepository.findByProductId(productId);
 
         if (productDetail != null){
-            productDetail.productDetailDelete(IS_DELETED);
+            productDetail.productDetailDelete(IS_DELETED, userDetails.getUsername());
             productDetail.delete(userDetails.getUsername());
         }
 
@@ -51,5 +51,19 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 
         ProductDetail saved = productDetailRepository.save(detail);
         return new ProductDetailResponseDto(saved.getProductDetailContent());
+    }
+
+    @Transactional
+    @Override
+    public void deleteProductDetail(UserDetails userDetails, UUID productId) {
+        ProductDetail productDetail = productDetailRepository.findByProductId(productId);
+        productDetail.productDetailDelete(IS_DELETED, userDetails.getUsername());
+    }
+
+    @Transactional
+    @Override
+    public void updateProductDetail(UUID productId, ProductDetailRequestDto productDetailRequestDto) {
+        ProductDetail productDetail = productDetailRepository.findByProductId(productId);
+        productDetail.update(productDetailRequestDto.getContent());
     }
 }
