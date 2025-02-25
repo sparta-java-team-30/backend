@@ -41,7 +41,6 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests((authorization)-> authorization
                 .requestMatchers("/api/auth/signup", "/api/auth/signin",
                         "/h2-console/**", "/swagger-ui/**").permitAll()
-                .requestMatchers("/api/auth").hasRole("MANAGER")
                 .requestMatchers("/api/stores/**").permitAll()
                 .requestMatchers("/api/categories/**").permitAll()
                 .requestMatchers("/api/review/{storeId}/reviews").permitAll()
