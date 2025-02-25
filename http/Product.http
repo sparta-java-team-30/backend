@@ -1,0 +1,28 @@
+### GET ALL PRODUCTS
+GET http://localhost:8080/api/products?page=1&size=10&sortBy=productName&isAsc=true
+Content-Type: application/json
+
+### GET PRODUCT BY ID
+GET http://localhost:8080/api/products/550e8400-e29b-41d4-a716-446655440000
+Content-Type: application/json
+
+### CREATE PRODUCT
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "치킨",
+  "price": 20000
+}
+
+### UPDATE PRODUCT
+PATCH http://localhost:8080/api/products/550e8400-e29b-41d4-a716-446655440000
+Content-Type: application/json
+
+{
+  "price": 18000
+}
+
+### DELETE PRODUCT
+DELETE http://localhost:8080/api/products/550e8400-e29b-41d4-a716-446655440000
+Content-Type: application/json

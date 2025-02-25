@@ -1,11 +1,7 @@
 package com.sparta.team30.common.exception;
 
-import com.sparta.team30.category.exception.CategoryAlreadyDeleteException;
-import com.sparta.team30.category.exception.CategoryNotFoundException;
-import com.sparta.team30.category.exception.DuplicateCategoryException;
-import com.sparta.team30.review.exception.ReviewAccessDeniedException;
-import com.sparta.team30.review.exception.ReviewNotFoundException;
-import com.sparta.team30.review.exception.ReviewTimeExpiredException;
+import com.sparta.team30.category.exception.*;
+import com.sparta.team30.store.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -253,4 +249,85 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT
         );
     }
+
+    @ExceptionHandler(StoreOwnerAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> storeOwnerAlreadyExistsException(StoreOwnerAlreadyExistsException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(StoreAlreadyApproveException.class)
+    public ResponseEntity<ErrorResponse> storeAlreadyApproveException(StoreAlreadyApproveException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(StoreAlreadyDeleteException.class)
+    public ResponseEntity<ErrorResponse> storeAlreadyDeleteException(StoreAlreadyDeleteException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(StoreUpdateFailException.class)
+    public ResponseEntity<ErrorResponse> storeUpdateFailException(StoreUpdateFailException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(NotStoreOwnerException.class)
+    public ResponseEntity<ErrorResponse> notStoreOwnerException(NotStoreOwnerException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(StoreNotApproveException.class)
+    public ResponseEntity<ErrorResponse> storeNotApproveException(StoreNotApproveException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.CONFLICT.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(UserHasNoStoreException.class)
+    public ResponseEntity<ErrorResponse> userHasNoStoreException(UserHasNoStoreException e) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .message(e.getMessage())
+                        .build(),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+
+
+
 }

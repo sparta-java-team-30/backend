@@ -1,0 +1,44 @@
+### Store
+### GET Store
+GET http://localhost:8080/api/stores
+
+### GET My Store
+GET http://localhost:8080/api/stores/my
+
+### GET Unapproved Store
+GET http://localhost:8080/api/stores/unapproved
+
+### GET Specific Store
+GET http://localhost:8080/api/stores/{store-id}
+
+### POST Store
+POST http://localhost:8080/api/stores
+Content-Type: application/json
+
+{
+  "categoryId": "8b828196-22a0-4749-9fcd-6ad549c497a0",
+  "storeName": "한식당1",
+  "storePhone": "0212341234",
+  "storePostcode": "01234",
+  "storeAddress1": "서울 종로구",
+  "storeAddress2": " 2층"
+}
+
+### PATCH Store
+PATCH http://localhost:8080/api/stores/{store-id}
+Content-Type: application/json
+
+{
+  "isApproved": true
+}
+
+### PUT Store
+PUT http://localhost:8080/api/stores/{store-id}
+Content-Type: application/json
+
+{
+  "storeName": "한식당2"
+}
+
+### DELETE Store
+DELETE http://localhost:8080/api/stores/{store-id}
