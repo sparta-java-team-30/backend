@@ -1,24 +1,23 @@
 package com.sparta.team30.store.service;
 
-import com.sparta.team30.category.domain.Category;
-import com.sparta.team30.category.respository.CategoryRepository;
-import com.sparta.team30.category.exception.CategoryNotFoundException;
+import com.sparta.team30.category.dto.CategoryDto;
+import com.sparta.team30.category.service.CategoryService;
 import com.sparta.team30.common.exception.DuplicateStoreException;
 import com.sparta.team30.common.exception.StoreNotFoundException;
+import com.sparta.team30.store.exception.*;
+import com.sparta.team30.common.security.UserDetailsImpl;
 import com.sparta.team30.store.domain.Store;
 import com.sparta.team30.store.dto.*;
 import com.sparta.team30.store.repository.StoreRepository;
+import com.sparta.team30.user.domain.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -26,9 +25,7 @@ import java.util.UUID;
 public class StoreService {
 
     private final StoreRepository storeRepository;
-    private final CategoryRepository categoryRepository;
-    private final MessageSource messageSource;
-
+    private final CategoryService categoryService;
 
     public Page<StoreListResponseDto> getStores(
             int page,
@@ -45,15 +42,15 @@ public class StoreService {
         return storeList.map(StoreListResponseDto::new);
     }
 
-    public StoreResponseDto getStore(UUID uuid) {
-        Store store = storeRepository.findById(uuid).orElseThrow(() ->
-                new StoreNotFoundException(messageSource.getMessage(
-                        "nod.found.store",
-                        null,
-                        "Not Found Store",
-                        Locale.getDefault()
-                ))
-        );
+    public StoreResponseDto getStore(UUID storeId) {
+        return new StoreResponseDto(storeFindById(storeId));
+    }
+
+    public StoreResponseDto getMyStore(User user) {
+        Store store = storeRepository.getMyStore(user);
+        if(store == null) {
+            throw new UserHasNoStoreException("이 사용자는 아직 음식점을 등록하지 않았습니다.");
+        }
         return new StoreResponseDto(store);
     }
 
@@ -61,15 +58,19 @@ public class StoreService {
         if (limit != 10 && limit != 30 && limit != 50) {
             limit = 10;
         }
-        Sort.Direction direction = ("asc").equalsIgnoreCase(order) ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, sortBy);
-        Pageable pageable = PageRequest.of(page, limit, sort);
+        Pageable pageable = PageRequest.of(page, limit);
         Page<Store> storeList = storeRepository.findUnapprovedStores(pageable, sortBy, order);
         return storeList.map(StoreListResponseDto::new);
     }
 
     @Transactional
-    public StoreCreateResponseDto createStore(@Valid StoreRequestDto requestDto) {
+    public StoreCreateResponseDto createStore(@Valid StoreRequestDto requestDto, User owner) {
+        boolean isAlreadyOwner = storeRepository.isAlreadyOwner(owner);
+
+        if (isAlreadyOwner) {
+            throw new StoreOwnerAlreadyExistsException("이미 가게가 존재하는 사용자입니다.");
+        }
+
         boolean isDuplicated = storeRepository.isDuplicateStore(
                 requestDto.getCategoryId(),
                 requestDto.getStoreName(),
@@ -77,93 +78,73 @@ public class StoreService {
                 requestDto.getStorePostcode(),
                 requestDto.getStoreAddress1()
         );
+
         if (isDuplicated) {
-            throw new DuplicateStoreException(messageSource.getMessage(
-                    "duplicate.store",
-                    null,
-                    "Duplicate Store",
-                    Locale.getDefault()
-            ));
+            throw new DuplicateStoreException("중복된 음식점이 이미 존재합니다.");
         }
 
-        Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(() ->
-                new CategoryNotFoundException(messageSource.getMessage(
-                        "not.found.category",
-                        null,
-                        "Not Found Category",
-                        Locale.getDefault()
-                ))
-        );
-        Store store = storeRepository.save(new Store(category, requestDto));
+        CategoryDto categoryDto = categoryService.getCategoryById(requestDto.getCategoryId());
+        Store store = storeRepository.save(new Store(categoryDto, requestDto, owner));
         return new StoreCreateResponseDto(store);
     }
 
     @Transactional
-    public StoreApproveResponseDto approveStore(UUID uuid) {
-        Store store = storeRepository.findById(uuid).orElseThrow(() ->
-                new StoreNotFoundException(messageSource.getMessage(
-                        "nod.found.store",
-                        null,
-                        "Not Found Store",
-                        Locale.getDefault()
-                ))
-        );
-        store.approve();
+    public StoreApproveResponseDto approveStore(UUID storeId) {
+        Store store = storeFindById(storeId);
+
+        if(store.getIsApproved())
+            throw new StoreAlreadyApproveException("이미 승인한 가게입니다.");
+
+        store.setIsApproved(true);
+
         return new StoreApproveResponseDto(store);
     }
 
+    public boolean isOwner(UUID storeId, UserDetailsImpl userDetails) {
+        boolean isOwner = storeRepository.isOwner(storeId, userDetails.getUser());
+        if (!isOwner) {
+            throw new NotStoreOwnerException("이 사용자는 이 가게의 주인이 아닙니다.");
+        }
+
+        return isOwner;
+    }
+
     @Transactional
-    public StoreResponseDto updateStore(UUID uuid, StoreUpdateRequestDto requestDto) {
-        Store store = storeRepository.findById(uuid).orElseThrow(() ->
-                new StoreNotFoundException(messageSource.getMessage(
-                        "not.found.store",
-                        null,
-                        "Not Found Store",
-                        Locale.getDefault()
-                ))
-        );
+    public StoreResponseDto updateStore(UUID storeId, StoreUpdateRequestDto requestDto) {
+        Store store = storeFindById(storeId);
+
+        if(!store.getIsApproved())
+            throw new StoreNotApproveException("승인되지 않은 음식점입니다.");
+
         if (requestDto.getCategoryId() != null) {
-            Category category = categoryRepository.findById(requestDto.getCategoryId()).orElseThrow(() ->
-                    new CategoryNotFoundException(messageSource.getMessage(
-                            "not.found.category",
-                            null,
-                            "Not Found Category",
-                            Locale.getDefault()
-                    ))
-            );
-            store.setCategory(category);
+            categoryService.categoryExists(requestDto.getCategoryId());
         }
-        if (requestDto.getStoreName() != null && !requestDto.getStoreName().isEmpty()) {
-            store.setStoreName(requestDto.getStoreName());
+
+        long count = storeRepository.updateStore(storeId, requestDto);
+
+        if (count == 0) {
+            throw new StoreUpdateFailException("음식점 수정 중 문제가 생겼습니다.");
         }
-        if (requestDto.getStorePhone() != null && !requestDto.getStorePhone().isEmpty()) {
-            store.setStorePhone(requestDto.getStorePhone());
-        }
-        if (
-                (requestDto.getStorePostcode() != null && !requestDto.getStorePostcode().isEmpty())
-                        &&
-                        (requestDto.getStoreAddress1() != null && !requestDto.getStoreAddress1().isEmpty())
-        ) {
-            store.setStorePostcode(requestDto.getStorePostcode());
-            store.setStoreAddress1(requestDto.getStoreAddress1());
-            if (requestDto.getStoreAddress2() != null && !requestDto.getStoreAddress2().isEmpty()) {
-                store.setStoreAddress2(requestDto.getStoreAddress2());
-            }
-        }
+
         return new StoreResponseDto(store);
     }
 
     @Transactional
-    public StoreDeleteResponseDto deleteStore(UUID uuid, String deletedBy) {
-        Store store = storeRepository.findById(uuid).orElseThrow(() ->
-                new StoreNotFoundException(messageSource.getMessage(
-                        "not.found.store",
-                        null,
-                        "Not Found Store",
-                        Locale.getDefault()
-                ))
-        );
+    public StoreDeleteResponseDto deleteStore(UUID storeId, String deletedBy) {
+        Store store = storeFindById(storeId);
+
+        if(store.getIsDeleted()) {
+            throw new StoreAlreadyDeleteException("이미 삭제한 가게입니다.");
+        }
+
         store.delete(deletedBy);
         return new StoreDeleteResponseDto(store);
+
+    }
+
+    public Store storeFindById(UUID storeId) {
+        return storeRepository.findById(storeId).orElseThrow(() ->
+                new StoreNotFoundException("해당 음식점을 찾을 수 없습니다.")
+        );
     }
 }

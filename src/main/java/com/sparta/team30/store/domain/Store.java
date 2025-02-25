@@ -1,8 +1,10 @@
 package com.sparta.team30.store.domain;
 
 import com.sparta.team30.category.domain.Category;
+import com.sparta.team30.category.dto.CategoryDto;
 import com.sparta.team30.common.domain.BaseEntity;
 import com.sparta.team30.store.dto.StoreRequestDto;
+import com.sparta.team30.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +18,14 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "p_store")
+@Table(
+        name = "p_store",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "unique_store",
+                        columnNames = {"category_id", "storeName", "storePhone", "storePostcode", "storeAddress1"})
+        }
+)
 public class Store extends BaseEntity {
 
     @Id
@@ -28,6 +37,10 @@ public class Store extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
 
     @Column(name = "store_name", nullable = false)
     private String storeName;
@@ -74,18 +87,14 @@ public class Store extends BaseEntity {
         }
     }
 
-
-    public Store(Category category, StoreRequestDto requestDto) {
-        this.category = category;
+    public Store(CategoryDto categoryDto, StoreRequestDto requestDto, User user) {
+        this.category = new Category(categoryDto);
+        this.owner = user;
         this.storeName = requestDto.getStoreName();
         this.storePhone = requestDto.getStorePhone();
         this.storePostcode = requestDto.getStorePostcode();
         this.storeAddress1 = requestDto.getStoreAddress1();
         this.storeAddress2 = requestDto.getStoreAddress2();
-    }
-
-    public void approve() {
-        this.isApproved = true;
     }
 
     @Override

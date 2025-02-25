@@ -76,5 +76,18 @@ public class CategoryService {
         return result;
     }
 
+    public CategoryDto getCategoryById(UUID categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() ->
+                new CategoryNotFoundException("카테고리가 존재하지 않습니다.")
+        );
+        return new CategoryDto(category);
+    }
+
+    public void categoryExists(UUID categoryId) {
+        categoryRepository.findById(categoryId).orElseThrow(() ->
+                new CategoryNotFoundException("카테고리가 존재하지 않습니다.")
+        );
+    }
+
 }
 
