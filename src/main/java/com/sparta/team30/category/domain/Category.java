@@ -26,7 +26,7 @@ public class Category extends BaseEntity {
     @Column(name = "category_id", updatable = false, nullable = false)
     private UUID categoryId;
 
-    @Column(name = "category_name", nullable = false, unique = true)
+    @Column(name = "category_name", nullable = false)
     private String categoryName;
 
     @Column(name = "is_deleted", nullable = false)

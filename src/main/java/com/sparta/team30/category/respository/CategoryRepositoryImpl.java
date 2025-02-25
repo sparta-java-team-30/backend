@@ -17,7 +17,8 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
                 .select(category.count())
                 .from(category)
                 .where(
-                        category.categoryName.eq(categoryName)
+                        category.categoryName.eq(categoryName),
+                        category.isDeleted.eq(false)
                 )
                 .fetchOne();
         return count > 0;
